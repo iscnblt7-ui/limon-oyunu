@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: Pro Evolution</title>
+    <title>ESSE STUDIO: Nightmare Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -11,122 +11,99 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; }
         body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* TICKER */
-        .ticker { background: #1a1500; color: var(--gold); font-size: 10px; padding: 5px; white-space: nowrap; overflow: hidden; border-bottom: 1px solid #333; }
-        .ticker-inner { display: inline-block; animation: ticker-anim 25s linear infinite; }
+        .ticker { background: #1a0000; color: #ff4444; font-size: 10px; padding: 5px; white-space: nowrap; overflow: hidden; border-bottom: 1px solid #444; font-weight: bold; }
+        .ticker-inner { display: inline-block; animation: ticker-anim 20s linear infinite; }
         @keyframes ticker-anim { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* HEADER */
         .top-row { display: flex; justify-content: space-between; padding: 10px 20px; align-items: center; }
-        #balance { font-size: 40px; font-weight: 900; color: var(--gold); text-align: center; }
-        .progress-bar { height: 8px; background: #222; border-radius: 10px; overflow: hidden; }
-        #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #fff); width: 0%; transition: 0.5s; }
+        #balance { font-size: 38px; font-weight: 900; color: var(--gold); text-align: center; text-shadow: 0 0 20px rgba(255,207,37,0.5); }
+        
+        .progress-bar { height: 10px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        #level-fill { height: 100%; background: linear-gradient(90deg, #8e44ad, #f1c40f); width: 0%; transition: 0.8s; }
 
-        /* BOSS UI */
-        #boss-ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-
-        /* SCREENS */
         .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .active-screen { display: flex; animation: fadeIn 0.3s; }
+        .active-screen { display: flex; animation: fadeIn 0.4s; }
 
-        /* SLOT ANIMASYONU */
-        .slot-machine { display: flex; gap: 10px; background: #222; padding: 20px; border-radius: 15px; border: 4px solid var(--gold); margin-bottom: 15px; }
-        .slot-box { width: 60px; height: 80px; background: #111; display: flex; align-items: center; justify-content: center; font-size: 40px; border-radius: 10px; overflow: hidden; position: relative; }
-        .slot-reel { position: absolute; transition: transform 2s cubic-bezier(0.1, 0, 0.1, 1); }
+        /* ŞANS OYUNLARI GRAFİK */
+        .slot-machine { display: flex; gap: 8px; background: linear-gradient(145deg, #222, #000); padding: 15px; border-radius: 15px; border: 3px solid #444; margin: 15px 0; }
+        .slot-box { width: 55px; height: 70px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 35px; border-radius: 8px; border: 1px solid #333; }
+        
+        .wheel-container { position: relative; width: 180px; height: 180px; margin: 15px 0; }
+        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #222; transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); background: conic-gradient(#c0392b 0 60deg, #2980b9 60deg 120deg, #27ae60 120deg 180deg, #f39c12 180deg 240deg, #8e44ad 240deg 300deg, #2c3e50 300deg 360deg); }
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 25px; height: 35px; background: #fff; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; filter: drop-shadow(0 2px 5px black); }
 
-        /* ÇARK ANIMASYONU */
-        .wheel-container { position: relative; width: 200px; height: 200px; margin: 20px 0; }
-        #wheel { width: 100%; height: 100%; border-radius: 50%; border: 5px solid var(--gold); transition: transform 4s cubic-bezier(0.1, 0, 0.1, 1); background: conic-gradient(red 0 60deg, blue 60deg 120deg, green 120deg 180deg, orange 180deg 240deg, purple 240deg 300deg, yellow 300deg 360deg); }
-        .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 20px; height: 30px; background: white; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
+        #main-coin { width: 190px; transition: 0.05s; cursor: pointer; filter: grayscale(0.3); }
+        #main-coin:active { transform: scale(0.85); filter: grayscale(0); }
 
-        /* GAME */
-        #main-coin { width: 200px; transition: 0.05s; cursor: pointer; }
-        #main-coin:active { transform: scale(0.9); }
-
-        /* NAV */
-        .nav { position: fixed; bottom: 10px; width: 96%; left: 2%; background: rgba(10,10,10,0.95); border-radius: 20px; display: flex; padding: 10px; z-index: 100; border: 1px solid #222; }
-        .nav-item { flex: 1; text-align: center; color: #444; font-size: 8px; }
+        .nav { position: fixed; bottom: 10px; width: 96%; left: 2%; background: rgba(5,5,5,0.98); border-radius: 20px; display: flex; padding: 12px; z-index: 100; border: 1px solid #333; }
+        .nav-item { flex: 1; text-align: center; color: #555; font-size: 9px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
-        .nav-item span { display: block; font-size: 18px; }
+        .nav-item span { display: block; font-size: 20px; margin-bottom: 2px; }
 
-        .card { background: #111; padding: 15px; border-radius: 20px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid #222; }
-        .btn-act { background: var(--gold); border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .particle { position: absolute; pointer-events: none; animation: pUp 0.8s forwards; font-weight: bold; color: var(--gold); }
-        @keyframes pUp { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--tx), var(--ty)); } }
+        .card { background: #0a0a0a; padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid #1a1a1a; }
+        .btn-act { background: #222; color: var(--gold); border: 1px solid var(--gold); padding: 8px 12px; border-radius: 8px; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn-act:active { background: var(--gold); color: black; }
+        
+        .particle { position: absolute; pointer-events: none; animation: pUp 1s forwards; font-weight: 900; color: #fff; text-shadow: 0 0 5px var(--gold); }
+        @keyframes pUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px) scale(1.5); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="ticker">
-        <div class="ticker-inner">🎰 YENİ: Animasyonlu Slot ve Çark sistemi aktif! • ⚡ UYARI: Enerji tüketimi arttı! • 📈 BİLGİ: Level atladıkça tık gücün artar!</div>
-    </div>
-
-    <div id="boss-ui">
-        <button class="btn-act" style="position:absolute; top:20px; right:20px;" onclick="closeBoss(false)">KAÇ</button>
-        <h1 style="color:var(--boss)">BOSS SAVAŞI</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="150" onclick="hitBoss()">
-        <div style="width:80%; height:10px; background:#222; margin-top:20px;"><div id="boss-hp" style="height:100%; background:red; width:100%"></div></div>
+        <div class="ticker-inner">⚠️ ZORLUK SEVİYESİ: KABUS • Enerji maliyeti arttı (3x) • Seviye atlamak artık %500 daha zor • Borsa çok dengesiz!</div>
     </div>
 
     <div class="top-row">
-        <div id="streak-view" style="font-size:10px; color:var(--fire)">🔥 STREAK: 0</div>
-        <div id="lv-display" style="font-size:10px; font-weight:bold;">LEVEL: 1</div>
+        <div id="streak-view" style="font-size:10px; color:var(--fire); font-weight:bold;">🔥 SERİ: 0</div>
+        <div id="lv-display" style="font-size:10px; font-weight:900; color: #8e44ad;">SEVİYE: 1</div>
     </div>
 
     <div class="header">
         <div id="balance">0</div>
-        <div style="width:70%; margin: 5px auto;">
+        <div style="width:80%; margin: 8px auto;">
             <div class="progress-bar"><div id="level-fill"></div></div>
+            <div id="lv-target-text" style="font-size:8px; color:#555; margin-top:4px; text-align:center;">HEDEF: 5,000</div>
         </div>
-        <div id="passive-label" style="font-size:9px; color:#777;">Tık Gücü: +1 | Pasif: +0/sn</div>
+        <div id="passive-label" style="font-size:9px; color:#888; letter-spacing:1px;">GÜÇ: +1 | PASİF: +0/sn</div>
     </div>
 
     <div id="game-s" class="screen active-screen">
         <div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
             <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" onclick="clickCoin(event)">
         </div>
-        <div style="width:90%; margin-bottom:10px">
-            <div style="display:flex; justify-content:space-between; font-size:10px;"><span>ENERJİ</span><span id="en-text">500/500</span></div>
-            <div class="progress-bar"><div id="en-fill" style="background:var(--gold); width:100%; height:100%"></div></div>
+        <div style="width:90%; margin-bottom:15px">
+            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:bold; margin-bottom:4px;"><span>ZAYIF ENERJİ</span><span id="en-text">500/500</span></div>
+            <div class="progress-bar" style="height:6px;"><div id="en-fill" style="background:linear-gradient(90deg, #f39c12, #e67e22); width:100%; height:100%"></div></div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3>MARKET & BORSA</h3>
-        <div style="background:#111; padding:15px; border-radius:15px; width:100%; margin:10px 0; border-left:4px solid var(--green)">
-            <b>ESSE Coin:</b> <span id="stock-price">10.0</span>
-            <div style="display:flex; gap:10px; margin-top:10px">
-                <button class="btn-act" style="flex:1" onclick="trade('buy')">AL</button>
-                <button class="btn-act" style="flex:1" onclick="trade('sell')">SAT</button>
-            </div>
-        </div>
-        <div class="card"><span>🏢</span><div style="flex:1; margin-left:10px"><h4>Gayrimenkul</h4><p>+1/sn | 2000 Altın</p></div><button class="btn-act" onclick="buy('re', 2000, 1)">AL</button></div>
-        <div class="card"><span>🤖</span><div style="flex:1; margin-left:10px"><h4>AI Sunucu</h4><p>+5/sn | 15.000 Altın</p></div><button class="btn-act" onclick="buy('ai', 15000, 5)">KUR</button></div>
+        <h3 style="color:var(--gold); margin-bottom:15px;">KABUL EDİLEN YATIRIMLAR</h3>
+        <div class="card"><span>🏢</span><div style="flex:1; margin-left:12px"><h4>Gecekondu</h4><p id="cost-re">+0.2/sn | 1.000 Altın</p></div><button class="btn-act" onclick="buy('re', 0.2)">SATIN AL</button></div>
+        <div class="card"><span>🤖</span><div style="flex:1; margin-left:12px"><h4>AI Madenci</h4><p id="cost-ai">+1.5/sn | 8.500 Altın</p></div><button class="btn-act" onclick="buy('ai', 1.5)">KURULUM</button></div>
+        <div class="card"><span>🚀</span><div style="flex:1; margin-left:12px"><h4>Yörünge İstasyonu</h4><p id="cost-space">+12/sn | 75.000 Altın</p></div><button class="btn-act" onclick="buy('space', 12)">BAŞLAT</button></div>
     </div>
 
     <div id="task-s" class="screen">
-        <h3>ŞANS OYUNLARI</h3>
-        
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <div id="wheel"></div>
-        </div>
-        <button class="btn-act" id="wheel-btn" onclick="spinWheel()" style="width:100%; margin-bottom:20px">ÇARK-I ESSE ÇEVİR</button>
+        <h3 style="color:var(--gold);">YERALTI KUMARHANESİ</h3>
+        <div class="wheel-container"><div class="wheel-pointer"></div><div id="wheel"></div></div>
+        <button class="btn-act" id="wheel-btn" onclick="spinWheel()" style="width:100%; margin-bottom:20px">KADER ÇARKINI ÇEVİR</button>
 
         <div class="slot-machine">
-            <div class="slot-box"><div id="slot1">🍒</div></div>
-            <div class="slot-box"><div id="slot2">🍒</div></div>
-            <div class="slot-box"><div id="slot3">🍒</div></div>
+            <div class="slot-box" id="slot1">💀</div>
+            <div class="slot-box" id="slot2">💀</div>
+            <div class="slot-box" id="slot3">💀</div>
         </div>
-        <button class="btn-act" id="slot-btn" onclick="playSlot()" style="width:100%">SLOT ÇEVİR (1000 Altın)</button>
+        <button class="btn-act" id="slot-btn" onclick="playSlot()" style="width:100%">SLOTU DÖNDÜR (2.500 Altın)</button>
     </div>
 
-    <div id="rank-s" class="screen"><h3>LİDERLER</h3><div class="card">🥇 SİZ: <b id="my-r">0</b></div></div>
+    <div id="rank-s" class="screen"><h3>DÜNYA SIRALAMASI</h3><div class="card">🏆 MEVCUT DURUMUNUZ: <b id="my-r" style="margin-left:10px">0</b></div></div>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="sh(this,'game-s')"><span>🏠</span>OYNA</div>
-        <div class="nav-item" onclick="sh(this,'market-s')"><span>📈</span>MARKET</div>
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💰</span>KAZAN</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>🏢</span>MARKET</div>
         <div class="nav-item" onclick="sh(this,'task-s')"><span>🎰</span>ŞANS</div>
         <div class="nav-item" onclick="sh(this,'rank-s')"><span>🏆</span>LİDER</div>
     </nav>
@@ -136,100 +113,112 @@
         let e = parseInt(localStorage.getItem('e')) || 500;
         let a = parseFloat(localStorage.getItem('a')) || 0;
         let lv = parseInt(localStorage.getItem('lv')) || 1;
-        let next_lv = 5000 * lv;
-        let s_price = 10.0;
-        let b_hp = 100;
-        let b_active = false;
-        let symbols = ['🍒', '💎', '💰', '7️⃣', '🌟'];
+        
+        // Fiyat Takibi (Enflasyon için)
+        let prices = { re: 1000, ai: 8500, space: 75000 };
+        let symbols = ['💀', '💰', '💎', '🔥', '🃏'];
+
+        function getNextLvCost() {
+            // Üssel Zorluk: 5000 * (lv^3) -> Seviye arttıkça imkansızlaşır
+            return 5000 * Math.pow(lv, 3);
+        }
 
         function up() {
+            let nxt = getNextLvCost();
             document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
             document.getElementById('en-text').innerText = `${e}/500`;
             document.getElementById('en-fill').style.width = (e/5) + "%";
-            document.getElementById('lv-display').innerText = `LEVEL: ${lv}`;
-            let tık_gucu = lv; // Level başına +1 tık gücü
-            document.getElementById('passive-label').innerText = `Tık Gücü: +${tık_gucu} | Pasif: +${(a).toFixed(1)}/sn`;
+            document.getElementById('lv-display').innerText = `SEVİYE: ${lv}`;
             
-            let perc = (b % next_lv) / (next_lv / 100);
-            document.getElementById('level-fill').style.width = perc + "%";
+            // Tık gücü her 2 seviyede bir artar
+            let click_power = Math.floor(lv / 2) + 1;
+            document.getElementById('passive-label').innerText = `GÜÇ: +${click_power} | PASİF: +${(a).toFixed(1)}/sn`;
             
-            if(b >= next_lv) { lv++; next_lv = 5000 * lv; alert("Level Atladın! Tık Gücün Arttı!"); }
+            let perc = (b / nxt) * 100;
+            document.getElementById('level-fill').style.width = Math.min(perc, 100) + "%";
+            document.getElementById('lv-target-text').innerText = `HEDEF: ${nxt.toLocaleString()}`;
+            
+            if(b >= nxt) { 
+                lv++; 
+                alert("TEBRİKLER! Seviye " + lv + " oldun. Ama artık işler daha zor..."); 
+            }
+
+            // Market yazılarını güncelle
+            document.getElementById('cost-re').innerText = `+0.2/sn | ${Math.floor(prices.re).toLocaleString()} Altın`;
+            document.getElementById('cost-ai').innerText = `+1.5/sn | ${Math.floor(prices.ai).toLocaleString()} Altın`;
+            document.getElementById('cost-space').innerText = `+12/sn | ${Math.floor(prices.space).toLocaleString()} Altın`;
+
             localStorage.setItem('b', b); localStorage.setItem('lv', lv);
         }
 
         function clickCoin(ev) {
-            // Enerji Tüketimi Arttırıldı (Tık başına 2 enerji)
-            if(e >= 2) {
-                b += lv; e -= 2; 
-                createParticle(ev.clientX, ev.clientY, "+" + lv);
+            // Enerji Tüketimi: 3
+            if(e >= 3) {
+                let cp = Math.floor(lv / 2) + 1;
+                b += cp; e -= 3; 
+                createParticle(ev.clientX, ev.clientY, "+" + cp);
                 up();
-            } else { alert("Enerji bitti!"); }
+            }
         }
 
-        // SLOT ANIMASYONU
+        function buy(id, p) {
+            if(b >= prices[id]) {
+                b -= prices[id];
+                a += p;
+                prices[id] *= 1.25; // %25 Enflasyon
+                up();
+            } else { alert("Bu yatırıma gücün yetmiyor!"); }
+        }
+
         function playSlot() {
-            if(b < 1000) return alert("Yetersiz Altın!");
-            b -= 1000;
+            if(b < 2500) return alert("Cebin boş!");
+            b -= 2500;
             document.getElementById('slot-btn').disabled = true;
-            
-            let intervals = [null, null, null];
             let counts = [0, 0, 0];
-            
-            [1, 2, 3].forEach((id, index) => {
-                intervals[index] = setInterval(() => {
+            let ivs = [null, null, null];
+
+            [1, 2, 3].forEach((id, i) => {
+                ivs[i] = setInterval(() => {
                     document.getElementById('slot'+id).innerText = symbols[Math.floor(Math.random()*symbols.length)];
-                    counts[index]++;
-                    if(counts[index] > 20 + (index * 10)) {
-                        clearInterval(intervals[index]);
-                        if(index === 2) finalizeSlot();
+                    counts[i]++;
+                    if(counts[i] > 25 + (i * 12)) {
+                        clearInterval(ivs[i]);
+                        if(i === 2) {
+                            let s1 = document.getElementById('slot1').innerText;
+                            let s2 = document.getElementById('slot2').innerText;
+                            let s3 = document.getElementById('slot3').innerText;
+                            if(s1===s2 && s2===s3 && s1==='💰') { b += 250000; alert("KASAYI PATLATTIIN! +250.000"); }
+                            else if(s1===s2 && s2===s3) { b += 50000; alert("ÜÇLEME! +50.000"); }
+                            document.getElementById('slot-btn').disabled = false;
+                            up();
+                        }
                     }
-                }, 50);
+                }, 60);
             });
         }
 
-        function finalizeSlot() {
-            let s1 = document.getElementById('slot1').innerText;
-            let s2 = document.getElementById('slot2').innerText;
-            let s3 = document.getElementById('slot3').innerText;
-            if(s1 === s2 && s2 === s3) { b += 50000; alert("JACKPOT! +50.000"); }
-            else if(s1 === s2 || s2 === s3 || s1 === s3) { b += 5000; alert("Küçük Kazanç! +5.000"); }
-            document.getElementById('slot-btn').disabled = false;
-            up();
-        }
-
-        // ÇARK ANIMASYONU
-        let currentRotation = 0;
+        let rot = 0;
         function spinWheel() {
-            let btn = document.getElementById('wheel-btn');
-            btn.disabled = true;
-            let extraDeg = Math.floor(Math.random() * 360) + 1440; // En az 4 tur döner
-            currentRotation += extraDeg;
-            document.getElementById('wheel').style.transform = `rotate(${currentRotation}deg)`;
+            document.getElementById('wheel-btn').disabled = true;
+            let add = Math.floor(Math.random() * 360) + 1800; 
+            rot += add;
+            document.getElementById('wheel').style.transform = `rotate(${rot}deg)`;
             
             setTimeout(() => {
-                let win = Math.floor(Math.random() * 10000);
+                let win = Math.random() > 0.7 ? Math.floor(Math.random() * 25000) : 0;
                 b += win;
-                alert("Çark Durdu! Kazancın: " + win);
-                btn.disabled = false;
+                alert(win > 0 ? "KAZANDIN: " + win : "HİÇBİR ŞEY KAZANAMADIN...");
+                document.getElementById('wheel-btn').disabled = false;
                 up();
             }, 4000);
         }
 
-        function trade(t) {
-            if(t==='buy' && b>=s_price) { b -= s_price; alert("Coin Alındı!"); }
-            if(t==='sell') { b += parseFloat(s_price); alert("Coin Satıldı!"); }
-            up();
-        }
-
-        function buy(id, cost, p) { if(b>=cost){ b-=cost; a+=p; up();} }
-
-        function createParticle(x, y, text) {
+        function createParticle(x, y, txt) {
             const p = document.createElement('div');
-            p.innerText = text; p.className = 'particle';
+            p.innerText = txt; p.className = 'particle';
             p.style.left = x + 'px'; p.style.top = y + 'px';
-            p.style.setProperty('--tx', (Math.random()*100-50)+'px');
-            p.style.setProperty('--ty', (-100)+'px');
-            document.body.appendChild(p); setTimeout(()=>p.remove(), 800);
+            p.style.setProperty('--tx', (Math.random()*60-30)+'px');
+            document.body.appendChild(p); setTimeout(()=>p.remove(), 1000);
         }
 
         function sh(el, id) {
@@ -238,12 +227,12 @@
             document.getElementById(id).classList.add('active-screen'); el.classList.add('active');
         }
 
-        setInterval(() => { b += (a/10); if(e < 500) e++; up(); }, 100);
+        // Pasif Gelir ve Enerji Dolumu (Dolum hızı %50 yavaşlatıldı)
         setInterval(() => { 
-            let c = (Math.random()*2-1).toFixed(2);
-            s_price = Math.max(1, parseFloat(s_price)+parseFloat(c)).toFixed(2);
-            document.getElementById('stock-price').innerText = s_price;
-        }, 5000);
+            b += (a/10); 
+            if(Math.random() > 0.5 && e < 500) e++; 
+            up(); 
+        }, 100);
 
         up();
     </script>
