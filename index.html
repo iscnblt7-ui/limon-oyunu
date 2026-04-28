@@ -3,179 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Money Clicker Pro</title>
+    <title>Money Clicker Empire</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%); 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
+            background: #0a0a0a; color: white; 
+            font-family: 'Poppins', sans-serif; height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Üst Panel */
-        .header { margin-top: 40px; text-align: center; }
-        .balance-container { display: flex; align-items: center; gap: 10px; font-size: 42px; font-weight: bold; }
-        .coin-icon { width: 40px; height: 40px; }
+        /* --- ÜST PANEL --- */
+        .header { padding: 25px 20px; text-align: center; background: linear-gradient(to bottom, #1a1a1a, transparent); }
+        .balance-group { display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .coin-img { width: 45px; }
+        #balance { font-size: 42px; font-weight: 800; color: #ffd700; }
+        .rank { color: #888; font-size: 12px; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Ana Tıklama Alanı */
-        .click-area {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            width: 100%;
+        /* --- EKRANLAR --- */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .active-screen { display: flex; }
+
+        /* ANA EKRAN */
+        .click-circle {
+            position: relative; width: 260px; height: 260px;
+            background: rgba(255, 215, 0, 0.05); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255, 215, 0, 0.1);
         }
-        #money-btn {
-            width: 250px;
-            height: 250px;
-            cursor: pointer;
-            transition: transform 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
-        }
+        #money-btn { width: 200px; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
         #money-btn:active { transform: scale(0.9); }
 
-        /* Enerji Barı */
-        .energy-container { width: 80%; margin-bottom: 100px; }
-        .energy-text { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; color: #aaa; }
-        .energy-bar-bg { width: 100%; height: 12px; background: #333; border-radius: 10px; overflow: hidden; }
-        #energy-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ffcc00, #ffaa00); transition: width 0.2s; }
+        /* MARKET EKRANI */
+        .upgrade-card {
+            background: #151515; border: 1px solid #333; padding: 15px;
+            border-radius: 15px; margin-bottom: 12px; display: flex;
+            justify-content: space-between; align-items: center; width: 100%;
+        }
+        .upgrade-info h4 { color: #ffd700; margin-bottom: 4px; }
+        .upgrade-info p { font-size: 11px; color: #aaa; }
+        .buy-btn { background: #ffd700; color: black; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .buy-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        /* Alt Menü */
+        /* --- ALT MENÜ --- */
         .nav-bar {
-            position: fixed;
-            bottom: 20px;
-            width: 90%;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111; display: flex; justify-content: space-around;
+            padding: 12px 0; border-top: 1px solid #222; padding-bottom: 25px;
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #ccc; cursor: pointer; }
-        .nav-item i { font-size: 20px; margin-bottom: 5px; }
+        .nav-item { color: #555; text-align: center; cursor: pointer; font-size: 11px; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: #ffd700; transform: translateY(-3px); }
+        .nav-item span { font-size: 22px; display: block; margin-bottom: 2px; }
 
-        /* Tıklama Efekti */
-        .plus-one {
-            position: absolute;
-            color: #ffcc00;
-            font-size: 24px;
-            font-weight: bold;
-            animation: floatUp 0.8s ease-out forwards;
-            pointer-events: none;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-100px); }
-        }
+        /* --- ENERJİ --- */
+        .status-footer { padding: 15px 25px; background: #0a0a0a; }
+        .energy-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+        #energy-fill { width: 100%; height: 100%; background: #ffd700; transition: 0.2s; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="balance-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" class="coin-icon">
+        <div class="balance-group">
+            <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" class="coin-img">
             <span id="balance">0</span>
         </div>
+        <div id="rank" class="rank">YENİ GİRİŞİMCİ</div>
     </div>
 
-    <div class="click-area" id="click-zone">
-        <img id="money-btn" src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" alt="Money">
+    <div id="game-screen" class="screen active-screen">
+        <div class="click-circle">
+            <img id="money-btn" src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png">
+        </div>
     </div>
 
-    <div class="energy-container">
-        <div class="energy-text">
+    <div id="market-screen" class="screen">
+        <h3 style="align-self: flex-start; margin-bottom: 15px;">Pazar Yeri</h3>
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Süper Parmak</h4>
+                <p id="mt-desc">Tık başı: +1 | Maliyet: 100</p>
+            </div>
+            <button class="buy-btn" onclick="buyMultiTap()">Geliştir</button>
+        </div>
+        <div class="upgrade-card">
+            <div class="upgrade-info">
+                <h4>Otomatik Kasa</h4>
+                <p id="auto-desc">Sn başı: +1 | Maliyet: 500</p>
+            </div>
+            <button class="buy-btn" onclick="buyAutoClicker()">Satın Al</button>
+        </div>
+    </div>
+
+    <div id="tasks-screen" class="screen">
+        <h3>Görevler</h3>
+        <p style="color:#666; margin-top:20px">Yakında eklenecek...</p>
+    </div>
+
+    <div class="status-footer">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color: #888;">
             <span>⚡ Enerji</span>
-            <span id="energy-val">500 / 500</span>
+            <span id="energy-text">500 / 500</span>
         </div>
-        <div class="energy-bar-bg">
-            <div id="energy-fill"></div>
-        </div>
+        <div class="energy-bar"><div id="energy-fill"></div></div>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item">🏠<span>Ana Sayfa</span></div>
-        <div class="nav-item">⛏️<span>Madenci</span></div>
-        <div class="nav-item">📋<span>Görevler</span></div>
-        <div class="nav-item">👥<span>Arkadaşlar</span></div>
+        <div class="nav-item active" onclick="switchTab(this, 'game-screen')"><span>🏠</span>Ana Sayfa</div>
+        <div class="nav-item" onclick="switchTab(this, 'market-screen')"><span>⛏️</span>Madenci</div>
+        <div class="nav-item" onclick="switchTab(this, 'tasks-screen')"><span>📋</span>Görevler</div>
+        <div class="nav-item" onclick="alert('Yakında!')"><span>👥</span>Arkadaşlar</div>
     </div>
 
     <script>
-        let balance = parseInt(localStorage.getItem('balance')) || 0;
+        let balance = parseFloat(localStorage.getItem('balance')) || 0;
         let energy = parseInt(localStorage.getItem('energy')) || 500;
-        const maxEnergy = 500;
-
-        const balanceElem = document.getElementById('balance');
-        const energyElem = document.getElementById('energy-val');
-        const energyFill = document.getElementById('energy-fill');
-        const moneyBtn = document.getElementById('money-btn');
-        const clickZone = document.getElementById('click-zone');
-
-        // Başlangıç değerlerini yazdır
-        balanceElem.innerText = balance.toLocaleString();
-        updateEnergyUI();
-
-        // Tıklama Fonksiyonu
-        moneyBtn.addEventListener('click', (e) => {
-            if (energy > 0) {
-                balance += 1;
-                energy -= 1;
-                
-                updateUI();
-                spawnPlusOne(e);
-                saveData();
-
-                if (window.Telegram.WebApp.HapticFeedback) {
-                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                }
-            }
-        });
+        let multiTap = parseInt(localStorage.getItem('multiTap')) || 1;
+        let autoIncome = parseFloat(localStorage.getItem('autoIncome')) || 0;
 
         function updateUI() {
-            balanceElem.innerText = balance.toLocaleString();
-            updateEnergyUI();
+            document.getElementById('balance').innerText = Math.floor(balance).toLocaleString();
+            document.getElementById('energy-text').innerText = `${energy} / 500`;
+            document.getElementById('energy-fill').style.width = `${(energy/500)*100}%`;
+            
+            let mtCost = 100 * multiTap;
+            let autoCost = 500 * (autoIncome + 1);
+            
+            document.getElementById('mt-desc').innerText = `Tık başı: +${multiTap} | Maliyet: ${mtCost}`;
+            document.getElementById('auto-desc').innerText = `Sn başı: +${autoIncome.toFixed(1)} | Maliyet: ${autoCost}`;
+            
+            // Rank Güncelleme
+            if(balance > 50000) document.getElementById('rank').innerText = "MİLYONER CEO";
+            else if(balance > 5000) document.getElementById('rank').innerText = "DENEYİMLİ TÜCCAR";
         }
 
-        function updateEnergyUI() {
-            energyElem.innerText = `${energy} / ${maxEnergy}`;
-            energyFill.style.width = `${(energy / maxEnergy) * 100}%`;
+        // --- SEKME DEĞİŞTİRME SİSTEMİ ---
+        function switchTab(element, screenId) {
+            // Tüm ekranları gizle
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            // Tüm menü butonlarını pasif yap
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            // Seçilen ekranı göster ve butonu aktif yap
+            document.getElementById(screenId).classList.add('active-screen');
+            element.classList.add('active');
         }
 
-        function spawnPlusOne(e) {
-            const plus = document.createElement('div');
-            plus.innerText = '+1';
-            plus.className = 'plus-one';
-            plus.style.left = `${e.clientX}px`;
-            plus.style.top = `${e.clientY}px`;
-            document.body.appendChild(plus);
-            setTimeout(() => plus.remove(), 800);
+        document.getElementById('money-btn').onclick = (e) => {
+            if(energy >= multiTap) {
+                balance += multiTap;
+                energy -= multiTap;
+                updateUI();
+                save();
+                if(window.Telegram.WebApp.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            }
+        };
+
+        function buyMultiTap() {
+            let cost = 100 * multiTap;
+            if(balance >= cost) {
+                balance -= cost;
+                multiTap++;
+                updateUI(); save();
+            }
         }
 
-        function saveData() {
+        function buyAutoClicker() {
+            let cost = 500 * (autoIncome + 1);
+            if(balance >= cost) {
+                balance -= cost;
+                autoIncome += 0.5;
+                updateUI(); save();
+            }
+        }
+
+        setInterval(() => {
+            if(autoIncome > 0) balance += (autoIncome / 10);
+            if(energy < 500) energy++;
+            updateUI();
+        }, 100);
+
+        function save() {
             localStorage.setItem('balance', balance);
             localStorage.setItem('energy', energy);
+            localStorage.setItem('multiTap', multiTap);
+            localStorage.setItem('autoIncome', autoIncome);
         }
-
-        // Enerji Yenileme (Her 3 saniyede 1 enerji)
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy += 1;
-                updateEnergyUI();
-                saveData();
-            }
-        }, 3000);
 
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+        updateUI();
     </script>
 </body>
 </html>
