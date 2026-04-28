@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: Pro Edition</title>
+    <title>ESSE STUDIO: Ultimate Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #2ecc71; --blue: #0088cc; --purple: #9b59b6; }
+        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #2ecc71; --blue: #0088cc; --boss: #9b59b6; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; }
         body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -15,132 +15,174 @@
         .glow { position: fixed; top: 50%; left: 50%; width: 300px; height: 300px; background: var(--gold); filter: blur(150px); opacity: 0.1; transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
 
         /* HEADER */
-        .header { text-align: center; padding: 15px; border-bottom: 1px solid #222; background: rgba(0,0,0,0.5); z-index: 10; }
-        #balance { font-size: 45px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,207,37,0.5); }
-        #passive-inc { font-size: 13px; color: var(--green); font-weight: bold; margin-top: -5px; }
+        .header { text-align: center; padding: 10px; border-bottom: 1px solid #222; background: rgba(0,0,0,0.8); z-index: 10; }
+        #balance { font-size: 38px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,207,37,0.3); }
+        #passive-inc { font-size: 12px; color: var(--green); font-weight: bold; margin-top: -5px; }
+        #combo-wrap { height: 20px; margin-top: 5px; font-weight: 900; color: var(--fire); font-size: 18px; opacity: 0; transition: 0.2s; }
 
-        /* PROGRESS BARS */
-        .progress-bar { height: 10px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 8px auto; width: 85%; }
-        #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--fire)); transition: 0.5s; }
-        #en-fill { height: 100%; background: linear-gradient(90deg, #3498db, #2980b9); transition: 0.2s; }
+        .progress-bar { height: 8px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 5px auto; width: 80%; }
+        #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ff4500); width: 0%; transition: 0.8s; }
 
-        /* SCREENS */
-        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 140px; z-index: 5; }
-        .active-screen { display: flex; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* CARDS */
-        .card { background: rgba(25, 25, 25, 0.8); backdrop-filter: blur(5px); padding: 15px; border-radius: 20px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid #333; }
-        .btn-act { background: var(--gold); border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; color: black; font-size: 14px; box-shadow: 0 4px 0 #b7950b; }
-        .btn-act:active { transform: translateY(2px); box-shadow: none; }
-        .btn-act:disabled { background: #444; color: #777; box-shadow: none; }
+        /* EKRANLAR */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 130px; z-index: 5; }
+        .active-screen { display: flex; animation: fadeIn 0.3s; }
+        .card { background: #111; padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid #222; }
+        .btn-act { background: var(--gold); border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; color: black; font-size: 13px; }
 
         /* COIN */
-        #main-coin { width: 240px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 30px rgba(0,0,0,0.5)); }
-        #main-coin:active { transform: scale(0.88); }
-
-        /* NAV */
-        .nav { position: fixed; bottom: 20px; width: 92%; left: 4%; background: rgba(20,20,20,0.95); border-radius: 25px; display: flex; padding: 12px; z-index: 100; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: bold; }
-        .nav-item.active { color: var(--gold); }
-        .nav-item span { display: block; font-size: 24px; margin-bottom: 2px; }
+        #main-coin { width: 220px; cursor: pointer; transition: transform 0.05s; z-index: 10; }
+        #main-coin:active { transform: scale(0.9); }
 
         /* FLOATING TEXT */
-        .floating-text { position: absolute; color: white; font-weight: 900; font-size: 30px; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 5000; text-shadow: 0 0 10px var(--gold); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
+        .floating-text { position: absolute; color: var(--gold); font-weight: 900; font-size: 30px; pointer-events: none; animation: floatUp 0.7s ease-out forwards; z-index: 5000; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
 
-        /* SKIN SELECTION */
-        .skin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .skin-card { background: #111; padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; }
-        .skin-card.owned { border-color: var(--gold); }
+        /* SLOT & ÇARK */
+        .slot-machine { display: flex; gap: 8px; margin: 15px 0; }
+        .slot-box { width: 70px; height: 90px; background: #000; display: flex; align-items: center; justify-content: center; font-size: 40px; border-radius: 10px; border: 2px solid #333; }
+        #wheel { border-radius: 50%; border: 5px solid #222; transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); }
+
+        /* BOSS UI */
+        #boss-ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 10px; width: 96%; left: 2%; background: rgba(10,10,10,0.98); border-radius: 20px; display: flex; padding: 12px; z-index: 100; border: 1px solid #333; }
+        .nav-item { flex: 1; text-align: center; color: #444; font-size: 8px; font-weight: bold; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item span { display: block; font-size: 22px; margin-bottom: 2px; }
+
+        /* DAILY BOXES */
+        .daily-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-top: 10px; }
+        .day-box { background: #181818; padding: 8px; border-radius: 8px; text-align: center; font-size: 9px; border: 1px solid #333; }
+        .day-box.claimed { background: var(--green); color: black; }
+
+        .side-menu { position: fixed; right: -300px; top: 0; width: 280px; height: 100%; background: #0a0a0a; border-left: 2px solid var(--gold); z-index: 3000; transition: 0.4s; padding: 20px; }
+        .side-menu.open { right: 0; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="glow"></div>
 
+    <div id="boss-ui">
+        <h1 style="color:var(--boss); font-weight:900;">BOSS SAVAŞI!</h1>
+        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="150" onclick="hitBoss()" style="margin:30px; filter: drop-shadow(0 0 20px red);">
+        <div style="width:80%; height:10px; background:#222; border-radius:5px;"><div id="boss-hp" style="height:100%; background:red; width:100%;"></div></div>
+        <h2 id="boss-timer" style="margin-top:10px;">30s</h2>
+    </div>
+
+    <div id="side-menu" class="side-menu">
+        <h3 style="color:var(--gold);">👤 PROFİL</h3>
+        <p id="tg-name" style="margin: 15px 0; font-weight: bold;">Yükleniyor...</p>
+        <div class="card" style="flex-direction:column; align-items:start;">
+            <b>GÜNLÜK ÖDÜL</b>
+            <div class="daily-grid" id="daily-list"></div>
+            <button class="btn-act" style="width:100%; margin-top:10px;" id="daily-btn" onclick="claimDaily()">ÖDÜLÜ AL</button>
+        </div>
+        <h4 style="margin-top:20px;">GÖRÜNÜMLER</h4>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+            <div class="card" onclick="changeSkin('classic')" style="padding:5px; cursor:pointer;"><img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" width="30"> Klasik</div>
+            <div class="card" onclick="buySkin('diamond', 50000)" style="padding:5px; cursor:pointer;"><img src="https://cdn-icons-png.flaticon.com/512/12513/12513106.png" width="30"> Elmas</div>
+        </div>
+        <button class="btn-act" style="position:absolute; bottom:20px; width:85%; background:#222; color:white;" onclick="toggleMenu()">KAPAT</button>
+    </div>
+
     <div class="header">
         <div id="balance">0</div>
-        <div id="passive-inc">+0 / saniye</div>
+        <div id="passive-inc">+0/sn</div>
+        <div id="combo-wrap">COMBO X<span id="combo-val">0</span></div>
         <div class="progress-bar"><div id="level-fill"></div></div>
-        <p id="lv-text" style="font-size:10px; color:#777;">LEVEL 1</p>
     </div>
 
     <div id="game-s" class="screen active-screen">
-        <div style="flex-grow:1; display:flex; justify-content:center; align-items:center;">
+        <div style="flex-grow:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
             <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" onclick="clickCoin(event)">
+            <button id="turbo-btn" class="btn-act" style="display:none; margin-top:20px; background:var(--fire);" onclick="activateTurbo()">🔥 TURBO x5</button>
         </div>
         <div style="width:90%;">
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;">
-                <b>ENERJİ</b><b id="en-text">500/500</b>
-            </div>
-            <div class="progress-bar" style="height:12px; width:100%;"><div id="en-fill" style="width:100%;"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:10px;"><b>ENERJİ</b><b id="en-text">500/500</b></div>
+            <div class="progress-bar" style="height:10px; width:100%;"><div id="en-fill" style="background:var(--gold); width:100%;"></div></div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3 style="margin-bottom:20px; color:var(--gold);">UPGRADES</h3>
-        <div class="card">🚀 <div style="flex:1; margin-left:15px"><h4>Tık Gücü</h4><p id="c-click">Level 1</p></div><button class="btn-act" onclick="upgrade('click')">YÜKSELT</button></div>
-        <div class="card">🔋 <div style="flex:1; margin-left:15px"><h4>Kapasite</h4><p id="c-energy">500</p></div><button class="btn-act" onclick="upgrade('energy')">YÜKSELT</button></div>
-        <h3 style="margin:20px 0; color:var(--purple);">GÖRÜNÜMLER (SKINS)</h3>
-        <div class="skin-grid">
-            <div class="skin-card owned" onclick="changeSkin('https://cdn-icons-png.flaticon.com/512/2529/2529396.png')">
-                <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" width="50"><br>Klasik
-            </div>
-            <div class="skin-card" id="skin-diamond" onclick="buySkin('diamond', 50000, 'https://cdn-icons-png.flaticon.com/512/12513/12513106.png')">
-                <img src="https://cdn-icons-png.flaticon.com/512/12513/12513106.png" width="50"><br>Elmas (50K)
-            </div>
-        </div>
+        <h3>GELİŞTİRMELER</h3>
+        <div class="card">🚀 <div style="flex:1; margin-left:10px"><h4>Tık Gücü</h4><p id="c-click">500</p></div><button class="btn-act" onclick="upgrade('click')">YÜKSELT</button></div>
+        <div class="card">🔋 <div style="flex:1; margin-left:10px"><h4>Enerji Kapasite</h4><p id="c-energy">1000</p></div><button class="btn-act" onclick="upgrade('energy')">YÜKSELT</button></div>
+        <div class="card">🏢 <div style="flex:1; margin-left:10px"><h4>Emlak</h4><p id="c-re">+2/sn | 2500</p></div><button class="btn-act" onclick="buy('re',2)">SATIN AL</button></div>
+        <div class="card">🤖 <div style="flex:1; margin-left:10px"><h4>Robot</h4><p id="c-ai">+10/sn | 20000</p></div><button class="btn-act" onclick="buy('ai',10)">SATIN AL</button></div>
     </div>
 
     <div id="task-s" class="screen">
-        <h3 style="color:var(--gold)">ŞANS MERKEZİ</h3>
-        <canvas id="wheel" width="280" height="280" style="margin:20px 0; transition:5s cubic-bezier(0.15,0,0.15,1);"></canvas>
-        <button class="btn-act" id="wheel-btn" onclick="spinWheel()">ÇARK-I ESSE (2.000)</button>
-        <div style="margin: 30px 0; width: 100%; height: 1px; background: #333;"></div>
-        <button class="btn-act" onclick="claimDaily()" id="daily-btn" style="background:var(--green); width:200px;">GÜNLÜK ÖDÜLÜ AL</button>
+        <h3>ŞANSINI DENE</h3>
+        <canvas id="wheel" width="280" height="280" style="margin:15px 0;"></canvas>
+        <button class="btn-act" id="wheel-btn" onclick="spinWheel()" style="width:180px;">ÇEVİR (1.000)</button>
+        
+        <div class="slot-machine">
+            <div class="slot-box" id="s1">🎰</div><div class="slot-box" id="s2">🎰</div><div class="slot-box" id="s3">🎰</div>
+        </div>
+        <button class="btn-act" id="slot-btn" onclick="playSlot()" style="width:180px;">SLOT (2.500)</button>
+        <button class="btn-act" onclick="startBoss()" style="margin-top:15px; background:var(--boss); color:white;">BOSS SAVAŞI BAŞLAT</button>
     </div>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💰</span>TAP</div>
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>🏠</span>TAP</div>
         <div class="nav-item" onclick="sh(this,'market-s')"><span>⚡</span>SHOP</div>
-        <div class="nav-item" onclick="sh(this,'task-s')"><span>🎡</span>LUCK</div>
+        <div class="nav-item" onclick="sh(this,'task-s')"><span>🎰</span>LUCK</div>
+        <div class="nav-item" onclick="toggleMenu()"><span>👤</span>MENU</div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp; tg.expand();
-        
         let b = parseFloat(localStorage.getItem('b')) || 0;
         let e = parseInt(localStorage.getItem('e')) || 500;
         let maxE = parseInt(localStorage.getItem('maxE')) || 500;
         let clickLv = parseInt(localStorage.getItem('clickLv')) || 1;
         let lv = parseInt(localStorage.getItem('lv')) || 1;
         let a = parseFloat(localStorage.getItem('a')) || 0;
-        let lastDaily = localStorage.getItem('lastDaily') || 0;
-        let currentSkin = localStorage.getItem('currentSkin') || 'https://cdn-icons-png.flaticon.com/512/2529/2529396.png';
+        let lastClaim = localStorage.getItem('lastClaim') || 0;
+        let dayCount = parseInt(localStorage.getItem('dayCount')) || 0;
+        let currentSkin = localStorage.getItem('currentSkin') || 'classic';
         let ownedSkins = JSON.parse(localStorage.getItem('ownedSkins')) || ['classic'];
+
+        const skins = {
+            classic: 'https://cdn-icons-png.flaticon.com/512/2529/2529396.png',
+            diamond: 'https://cdn-icons-png.flaticon.com/512/12513/12513106.png'
+        };
+
+        let combo = 0; let comboTimer; let turbo = false; let b_hp = 100;
+        let costs = { re: 2500, ai: 20000, click: 500, energy: 1000 };
+        const syms = ['💎', '💰', '🌟', '7️⃣', '🍒'];
+
+        document.getElementById('tg-name').innerText = tg.initDataUnsafe?.user?.first_name || "Oyuncu";
 
         function up() {
             let nxt = 5000 * Math.pow(lv, 2);
             document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
-            document.getElementById('passive-inc').innerText = `+${a.toFixed(1)} / sn`;
+            document.getElementById('passive-inc').innerText = `+${a.toFixed(1)}/sn`;
             document.getElementById('en-fill').style.width = (e / maxE * 100) + "%";
             document.getElementById('en-text').innerText = `${e}/${maxE}`;
             document.getElementById('level-fill').style.width = Math.min((b/nxt)*100, 100) + "%";
-            document.getElementById('lv-text').innerText = `LEVEL ${lv} - HEDEF: ${nxt.toLocaleString()}`;
-            document.getElementById('main-coin').src = currentSkin;
-            
-            document.getElementById('c-click').innerText = `Level ${clickLv}`;
-            document.getElementById('c-energy').innerText = `${maxE}`;
+            document.getElementById('main-coin').src = skins[currentSkin];
+            document.getElementById('c-click').innerText = costs.click.toLocaleString();
+            document.getElementById('c-energy').innerText = costs.energy.toLocaleString();
             save();
         }
 
         function clickCoin(ev) {
             if(e >= clickLv) {
-                b += clickLv; e -= clickLv;
+                combo++; clearTimeout(comboTimer);
+                document.getElementById('combo-wrap').style.opacity = "1";
+                document.getElementById('combo-val').innerText = combo;
+                comboTimer = setTimeout(() => { combo = 0; document.getElementById('combo-wrap').style.opacity = "0"; }, 1200);
+
+                let gain = (clickLv + Math.floor(combo/15)) * (turbo ? 5 : 1);
+                b += gain; e -= clickLv;
                 tg.HapticFeedback.impactOccurred('medium');
+
                 const ft = document.createElement('div');
-                ft.className = 'floating-text'; ft.innerText = `+${clickLv}`;
+                ft.className = 'floating-text'; ft.innerText = `+${gain}`;
                 ft.style.left = `${ev.clientX - 20}px`; ft.style.top = `${ev.clientY - 40}px`;
                 document.body.appendChild(ft);
                 setTimeout(() => ft.remove(), 600);
@@ -149,46 +191,83 @@
         }
 
         function upgrade(type) {
-            let cost = type === 'click' ? clickLv * 1000 : maxE * 2;
-            if(b >= cost) {
-                b -= cost;
+            if(b >= costs[type]) {
+                b -= costs[type];
                 if(type === 'click') clickLv++; else maxE += 100;
-                tg.HapticFeedback.notificationOccurred('success');
+                costs[type] = Math.floor(costs[type] * 1.6);
                 up();
             }
         }
 
-        function buySkin(id, cost, url) {
-            if(ownedSkins.includes(id)) { currentSkin = url; up(); return; }
-            if(b >= cost) {
-                b -= cost; ownedSkins.push(id); currentSkin = url;
-                localStorage.setItem('ownedSkins', JSON.stringify(ownedSkins));
-                alert("Yeni Görünüm Açıldı!"); up();
-            }
-        }
-
         function claimDaily() {
-            let now = Date.now();
-            if(now - lastDaily > 86400000) {
-                b += 10000; lastDaily = now;
-                localStorage.setItem('lastDaily', lastDaily);
-                alert("10.000 Altın Alındı!"); up();
-            } else { alert("Yarın tekrar gel!"); }
+            if(Date.now() - lastClaim > 86400000) {
+                b += 5000; lastClaim = Date.now();
+                localStorage.setItem('lastClaim', lastClaim);
+                alert("Günlük 5.000 Altın Alındı!"); up();
+            } else alert("Yarın tekrar gel!");
         }
 
-        // ÇARK
-        const rew = ["500", "1000", "2000", "İFLAS", "5000", "100", "10000", "0"];
+        function changeSkin(s) { if(ownedSkins.includes(s)) { currentSkin = s; up(); } }
+        function buySkin(s, c) {
+            if(ownedSkins.includes(s)) { changeSkin(s); return; }
+            if(b >= c) { b -= c; ownedSkins.push(s); currentSkin = s; localStorage.setItem('ownedSkins', JSON.stringify(ownedSkins)); up(); }
+        }
+
+        const rew = ["0", "2000", "5000", "İFLAS", "10000", "1000", "25000", "500"];
         let rot = 0;
         function spinWheel() {
-            if(b < 2000) return;
-            b -= 2000; let add = (360 * 5) + Math.floor(Math.random() * 360);
+            if(b < 1000) return;
+            b -= 1000; document.getElementById('wheel-btn').disabled = true;
+            let add = (360 * 6) + Math.floor(Math.random() * 360);
             rot += add; document.getElementById('wheel').style.transform = `rotate(${rot}deg)`;
             setTimeout(() => {
                 let idx = Math.floor(((360 - (rot % 360) + 22.5) % 360) / 45);
                 let res = rew[idx % 8];
                 if(res === "İFLAS") b = 0; else b += parseInt(res);
-                up();
+                document.getElementById('wheel-btn').disabled = false; up();
             }, 5100);
+        }
+
+        function playSlot() {
+            if(b < 2500) return;
+            b -= 2500; document.getElementById('slot-btn').disabled = true;
+            let spins = [0,0,0];
+            [1,2,3].forEach((id, i) => {
+                let iv = setInterval(() => {
+                    document.getElementById('s'+id).innerText = syms[Math.floor(Math.random()*syms.length)];
+                    spins[i]++;
+                    if(spins[i] > 15 + i*8) {
+                        clearInterval(iv);
+                        if(i===2) {
+                            if(document.getElementById('s1').innerText === document.getElementById('s2').innerText && document.getElementById('s2').innerText === document.getElementById('s3').innerText) { b += 100000; alert("JACKPOT!"); }
+                            document.getElementById('slot-btn').disabled = false; up();
+                        }
+                    }
+                }, 60);
+            });
+        }
+
+        function startBoss() {
+            b_hp = 100; document.getElementById('boss-ui').style.display="flex";
+            let t = 30;
+            let iv = setInterval(() => {
+                t--; document.getElementById('boss-timer').innerText = t+"s";
+                if(t<=0 || b_hp<=0) {
+                    clearInterval(iv);
+                    if(b_hp<=0) { b += 50000; alert("BOSS YENİLDİ!"); }
+                    document.getElementById('boss-ui').style.display="none"; up();
+                }
+            }, 1000);
+        }
+        function hitBoss() { b_hp -= 5; document.getElementById('boss-hp').style.width = b_hp + "%"; tg.HapticFeedback.impactOccurred('heavy'); }
+
+        function buy(id, p) { if(b >= costs[id]){ b -= costs[id]; a += p; costs[id] = Math.floor(costs[id]*1.4); up(); } }
+        function save() { localStorage.setItem('b', b); localStorage.setItem('lv', lv); localStorage.setItem('e', e); localStorage.setItem('maxE', maxE); localStorage.setItem('clickLv', clickLv); localStorage.setItem('currentSkin', currentSkin); }
+        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
+        function sh(el, id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active-screen'); el.classList.add('active');
         }
 
         function drawW() {
@@ -202,14 +281,7 @@
             });
         }
 
-        function save() { localStorage.setItem('b', b); localStorage.setItem('lv', lv); localStorage.setItem('e', e); localStorage.setItem('maxE', maxE); localStorage.setItem('clickLv', clickLv); localStorage.setItem('currentSkin', currentSkin); }
-        function sh(el, id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active-screen'); el.classList.add('active');
-        }
-
-        setInterval(() => { if(e < maxE) e++; up(); }, 1500);
+        setInterval(() => { b += a/10; if(e < maxE) e++; up(); }, 100);
         drawW(); up();
     </script>
 </body>
