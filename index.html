@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limon Clicker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background-color: #f0f0f0; text-align: center; font-family: sans-serif; padding-top: 50px; }
+        #lemon { width: 200px; cursor: pointer; transition: transform 0.1s; }
+        #lemon:active { transform: scale(0.9); }
+        h1 { color: #333; }
+        .score { font-size: 24px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Limonu Tıkla!</h1>
+    <img id="lemon" src="https://img.icons8.com/emoji/256/lemon-emoji.png" alt="Limon">
+    <div class="score">Puan: <span id="score-val">0</span></div>
+
+    <script>
+        let score = 0;
+        const scoreElem = document.getElementById('score-val');
+        const lemonElem = document.getElementById('lemon');
+
+        lemonElem.onclick = () => {
+            score++;
+            scoreElem.innerText = score;
+        };
+
+        // Telegram için hazırla
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    </script>
+</body>
+</html>
