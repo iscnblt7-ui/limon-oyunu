@@ -7,395 +7,186 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #2ecc71; --blue: #0088cc; --purple: #9b59b6; --card-bg: rgba(25, 25, 25, 0.9); }
+        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #2ecc71; --blue: #0088cc; --purple: #9b59b6; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
-        body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Arka Plan Glow Efekti */
-        .glow { position: fixed; top: 50%; left: 50%; width: 250px; height: 250px; background: var(--gold); filter: blur(130px); opacity: 0.15; transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
+        /* Header */
+        .header { text-align: center; padding: 15px; border-bottom: 1px solid #222; background: rgba(0,0,0,0.8); z-index: 10; }
+        #balance { font-size: 40px; font-weight: 900; color: var(--gold); }
+        #passive-inc { font-size: 12px; color: var(--green); margin-top: -5px; }
 
-        /* HEADER */
-        .header { text-align: center; padding: 15px; border-bottom: 1px solid #222; background: rgba(0,0,0,0.6); z-index: 10; position: relative; }
-        #balance { font-size: 42px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,207,37,0.4); }
-        #passive-inc { font-size: 13px; color: var(--green); font-weight: bold; margin-top: -5px; }
-        
-        /* Combo Sayacı */
-        #combo-wrap { height: 22px; margin-top: 5px; font-weight: 900; color: var(--fire); font-size: 19px; opacity: 0; transition: 0.3s; transform: scale(1); }
-        .combo-active { opacity: 1 !important; transform: scale(1.1) !important; }
+        /* Screens */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
+        .active-screen { display: flex; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Progress Bars */
-        .progress-bar { height: 10px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 8px auto; width: 85%; }
-        #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--fire)); width: 0%; transition: 0.5s; }
-        #en-fill { height: 100%; background: linear-gradient(90deg, #3498db, #2980b9); width: 100%; transition: 0.2s; }
+        /* Cards & Buttons */
+        .card { background: #111; padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid #333; }
+        .btn-act { background: var(--gold); border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; color: black; font-size: 13px; }
+        .btn-act:disabled { background: #333; color: #666; }
 
-        /* SCREENS & CARDS */
-        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px 20px 140px 20px; overflow-y: auto; z-index: 5; position: relative; }
-        .active-screen { display: flex; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .card { background: var(--card-bg); backdrop-filter: blur(5px); padding: 15px; border-radius: 18px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid #333; }
-        .btn-act { background: var(--gold); border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; color: black; font-size: 14px; box-shadow: 0 4px 0 #b7950b; text-align: center; }
-        .btn-act:active { transform: translateY(2px); box-shadow: none; }
-        .btn-act:disabled { background: #444; color: #777; box-shadow: none; cursor: not-allowed; }
-
-        /* COIN */
-        #coin-wrapper { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; }
-        #main-coin { width: 230px; height: 230px; cursor: pointer; transition: transform 0.05s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.5)); border-radius: 50%; object-fit: cover; }
+        /* Coin */
+        #main-coin { width: 220px; height: 220px; cursor: pointer; transition: transform 0.05s; border-radius: 50%; }
         #main-coin:active { transform: scale(0.9); }
 
-        /* FLOATING TEXT */
-        .floating-text { position: absolute; color: white; font-weight: 900; font-size: 32px; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 5000; text-shadow: 0 0 10px var(--gold), 0 0 2px black; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
+        /* Progress */
+        .progress-bar { height: 10px; background: #222; border-radius: 10px; overflow: hidden; width: 85%; margin: 10px 0; }
+        #en-fill { height: 100%; background: var(--gold); width: 100%; transition: 0.2s; }
 
-        /* NAV */
-        .nav { position: fixed; bottom: 15px; width: 94%; left: 3%; background: rgba(15,15,15,0.97); border-radius: 25px; display: flex; padding: 10px; z-index: 100; border: 1px solid #444; backdrop-filter: blur(10px); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: bold; transition: 0.2s; position: relative; }
-        .nav-item.active { color: var(--gold); transform: translateY(-3px); }
-        .nav-item span { display: block; font-size: 24px; margin-bottom: 3px; }
+        /* Navigation */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; padding: 15px 0; border-top: 1px solid #222; z-index: 100; }
+        .nav-item { flex: 1; text-align: center; color: #555; font-size: 10px; font-weight: bold; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item span { display: block; font-size: 20px; }
 
-        /* LİDERLİK TABLOSU */
-        .leader-item { justify-content: space-between; padding: 12px 20px; border-radius: 12px; margin-bottom: 8px; }
-        .leader-item.rank-1 { border-color: var(--gold); background: rgba(255,207,37,0.05); }
-        .rank-number { font-weight: 900; font-size: 16px; width: 30px; }
+        /* Rank List */
+        .rank-card { justify-content: space-between; border-left: 4px solid var(--gold); }
 
-        /* BOSS UI */
-        #boss-ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        @keyframes pulse red { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-
-        /* DAILY & SKINS GIDS */
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; margin-top: 15px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 15px; }
-        .grid-box { background: #151515; padding: 10px; border-radius: 10px; text-align: center; font-size: 10px; border: 1px solid #333; transition: 0.2s; cursor: pointer; }
-        .grid-box.active { border-color: var(--gold); background: rgba(255,207,37,0.05); }
-        .grid-box.claimed { background: var(--green); color: black; border-color: transparent; }
-
-        .side-menu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: #0a0a0a; border-left: 3px solid var(--gold); z-index: 3000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; }
-        .side-menu.open { right: 0; }
-        .menu-btn { position: fixed; right: 15px; top: 15px; background: var(--gold); border: none; padding: 10px; border-radius: 12px; z-index: 3001; font-weight: 900; }
+        /* Floating Text */
+        .floating-text { position: absolute; color: var(--gold); font-weight: 900; font-size: 30px; pointer-events: none; animation: floatUp 0.6s forwards; z-index: 999; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
 
-    <script>
-        // Hata veren fotoğrafları buradaki linklerle değiştir kanki.
-        // Güvenilir, kalıcı linkler kullanmaya çalış (örneğin kendi sunucun veya imgur).
-        const AYARLAR = {
-            coinFoto: 'https://cdn-icons-png.flaticon.com/512/2529/2529396.png', // Ana coin fotosu
-            bossFoto: 'https://cdn-icons-png.flaticon.com/512/3037/3037134.png', // Boss fotosu
-            diamondSkinFoto: 'https://cdn-icons-png.flaticon.com/512/12513/12513106.png', // Elmas skin fotosu
-            botLink: 'https://t.me/ESSESTUDIO_BOT' // Kendi botunun linkini buraya yaz
-        };
-    </script>
-    <div class="glow"></div>
-
-    <div id="boss-ui">
-        <h1 style="color:var(--boss); font-weight:900; letter-spacing:1px; margin-bottom:10px;">BOSS ATTACK!</h1>
-        <img id="boss-img" src="" width="160" onclick="hitBoss()" style="margin:20px; filter: drop-shadow(0 0 25px red);">
-        <div style="width:80%; height:12px; background:#222; border-radius:10px;"><div id="boss-hp" style="height:100%; background:red; width:100%; border-radius:10px; transition: 0.1s;"></div></div>
-        <h2 id="boss-timer" style="margin-top:15px; font-size:28px;">30s</h2>
-    </div>
-
-    <button class="menu-btn" onclick="toggleMenu()">MENU</button>
-    
-    <div id="side-menu" class="side-menu">
-        <h2 style="color:var(--gold); margin-bottom:10px;">📊 PROFİL</h2>
-        <p id="tg-name" style="font-size: 18px; font-weight:900; color:white; border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px;">Misafir</p>
-        
-        <div class="card" style="background:#001a33; border-color: var(--blue); margin-bottom: 20px;">
-            <div style="flex:1"><b>TON Cüzdan</b><p id="wallet-status" style="font-size:10px; color:#aaa;">Bağlı Değil</p></div>
-            <button class="btn-act" id="wallet-connect-btn" style="width:100px; background:var(--blue); color:white; font-size:11px;" onclick="connectWallet()">BAĞLA</button>
-        </div>
-
-        <div class="card" style="flex-direction:column; align-items:start;">
-            <b style="color:var(--gold);">🎁 GÜNLÜK BONU</b>
-            <div class="grid-4" id="daily-list"></div>
-            <button class="btn-act" style="width:100%; margin-top:10px;" id="daily-btn" onclick="claimDaily()">ÖDÜLÜ TOPLA</button>
-        </div>
-
-        <button class="btn-act" style="position:absolute; bottom:20px; width:85%; background:#333; color:white;" onclick="toggleMenu()">KAPAT</button>
-    </div>
-
     <div class="header">
         <div id="balance">0</div>
-        <div id="passive-inc">+0 / sn</div>
-        <div id="combo-wrap">COMBO X<span id="combo-val">0</span></div>
-        <div class="progress-bar"><div id="level-fill"></div></div>
-        <p id="lv-text" style="font-size:10px; color:#777; font-weight:bold;">LEVEL 1</p>
+        <div id="passive-inc">+0/sn</div>
+        <div class="progress-bar" style="margin: 5px auto;"><div id="lv-fill" style="height:100%; background:var(--green); width:0%;"></div></div>
     </div>
 
     <div id="game-s" class="screen active-screen">
-        <div id="coin-wrapper">
-            <img id="main-coin" src="" onclick="clickCoin(event)">
+        <div style="flex-grow:1; display:flex; align-items:center; justify-content:center;">
+            <img id="main-coin" src="https://api.dicebear.com/7.x/icons/svg?seed=gold&backgroundColor=ffcf25" onclick="clickCoin(event)">
         </div>
-        <div style="width:90%; margin-bottom:10px">
-            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:900; color:var(--gold); margin-bottom:5px;">
-                <span>ENERJİ</span><span id="en-text">500/500</span>
-            </div>
-            <div class="progress-bar" style="height:12px; width:100%; border-color:#444;"><div id="en-fill"></div></div>
+        <div style="width:100%; text-align:center;">
+            <p style="font-size:12px; margin-bottom:5px;">ENERJİ: <span id="en-text">500/500</span></p>
+            <div class="progress-bar" style="width:100%;"><div id="en-fill"></div></div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3 style="margin-bottom:15px; color:var(--gold);">UPGRADES</h3>
-        <div class="card">🚀 <div style="flex:1; margin-left:15px"><h4>Tık Gücü</h4><p id="c-click">Lv 1 | 500</p></div><button class="btn-act" onclick="upgrade('click')">YÜKSELT</button></div>
-        <div class="card">🔋 <div style="flex:1; margin-left:15px"><h4>Kapasite</h4><p id="c-energy">+50 | 1000</p></div><button class="btn-act" onclick="upgrade('energy')">YÜKSELT</button></div>
-        <div class="card">🏢 <div style="flex:1; margin-left:15px"><h4>Emlak</h4><p id="c-re">+2/sn | 2.500</p></div><button class="btn-act" onclick="buy('re',2)">SATIN AL</button></div>
-        <div class="card">🤖 <div style="flex:1; margin-left:15px"><h4>Robot</h4><p id="c-ai">+10/sn | 20.000</p></div><button class="btn-act" onclick="buy('ai',10)">SATIN AL</button></div>
+        <h2 style="color:var(--gold); margin-bottom:20px;">MARKET</h2>
+        <div class="card">🚀 <div style="flex:1; margin-left:10px;"><b>Tık Gücü</b><br><small id="c-click">Maliyet: 500</small></div><button class="btn-act" onclick="upgrade('click')">YÜKSELT</button></div>
+        <div class="card">🔋 <div style="flex:1; margin-left:10px;"><b>Enerji</b><br><small id="c-energy">Maliyet: 1000</small></div><button class="btn-act" onclick="upgrade('energy')">YÜKSELT</button></div>
         
-        <h3 style="margin:20px 0 10px 0; color:var(--purple);">GÖRÜNÜMLER (SKINS)</h3>
-        <div class="grid-2">
-            <div class="grid-box active" id="skin-classic" onclick="setSkin('classic')"><img id="skin-img-classic" src="" width="40"><br>Klasik</div>
-            <div class="grid-box" id="skin-diamond" onclick="buySkin('diamond', 50000)"><img id="skin-img-diamond" src="" width="40"><br>Elmas (50K)</div>
+        <h3 style="margin:20px 0 10px 0; color:var(--blue);">CÜZDAN</h3>
+        <div class="card" style="background:rgba(0,136,204,0.1); border-color:var(--blue);">
+            <div style="flex:1;"><b>TON WALLET</b><br><small id="w-status">Bağlı Değil</small></div>
+            <button class="btn-act" id="w-btn" onclick="connectWallet()" style="background:var(--blue); color:white;">BAĞLA</button>
         </div>
-    </div>
-
-    <div id="task-s" class="screen">
-        <h3 style="color:var(--gold); margin-bottom:10px;">ŞANSINI DENE</h3>
-        <div style="position:relative; margin:15px 0;">
-            <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent; border-top:25px solid white; z-index:10;"></div>
-            <canvas id="wheel" width="280" height="280" style="transition:5s cubic-bezier(0.15,0,0.15,1); border-radius:50%; border:5px solid #222;"></canvas>
-        </div>
-        <button class="btn-act" id="wheel-btn" onclick="spinWheel()" style="width:200px; margin-bottom:20px;">ÇEVİR (1.000)</button>
-        <div class="slot-machine">
-            <div class="slot-box" id="s1">🎰</div><div class="slot-box" id="s2">🎰</div><div class="slot-box" id="s3">🎰</div>
-        </div>
-        <button class="btn-act" id="slot-btn" onclick="playSlot()" style="width:200px; margin-bottom:20px;">SLOT (2.500)</button>
-        
-        <button class="btn-act" onclick="startBoss()" style="background:var(--boss); color:white; width:200px; margin-top:10px; animation: pulse red 2s infinite;">BOSS SAVAŞI (Giriş: 5K)</button>
     </div>
 
     <div id="rank-s" class="screen">
-        <h3 style="color:var(--gold); margin-bottom:20px;">TOP 10 LİDERLER</h3>
-        <div class="card leader-item rank-1"><div><span class="rank-number" style="color:var(--gold);">1.</span> 👑 ESSE Creator</div><b>999M</b></div>
-        <div class="card leader-item"><div><span class="rank-number">2.</span> @ton_master</div><b>150M</b></div>
-        <div class="card leader-item"><div><span class="rank-number">3.</span> @crypto_king</div><b>75M</b></div>
-        <div class="card leader-item"><div><span class="rank-number">4.</span> Oyuncu_123</div><b>10M</b></div>
-        <div class="card leader-item"><div><span class="rank-number">5.</span> Ahmet_Tan</div><b>5M</b></div>
-        
-        <div class="card leader-item" style="margin-top:20px; border-color:var(--green); background:rgba(46,204,113,0.05);">
-            <div><span class="rank-number" style="color:var(--green);">#?</span> SEN</div><b id="my-rank-val">0</b>
+        <h2 style="color:var(--gold); margin-bottom:20px;">LİDERLER</h2>
+        <div class="card rank-card"><span>1. ESSE Master</span><b>1.5M</b></div>
+        <div class="card rank-card"><span>2. CryptoKing</span><b>850K</b></div>
+        <div class="card rank-card"><span>3. TonHacker</span><b>420K</b></div>
+        <div class="card rank-card" style="border-color:var(--green); margin-top:20px;">
+            <span>SİZ</span><b id="my-rank-val">0</b>
         </div>
-        <p style="font-size:10px; color:#555; margin-top:10px;">*Sıralama database bağlandığında anlık güncellenir.</p>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="sh(this,'game-s')"><span>💰</span>TAP</div>
-        <div class="nav-item" onclick="sh(this,'market-s')"><span>⚡</span>SHOP</div>
-        <div class="nav-item" onclick="sh(this,'task-s')"><span>🎡</span>LUCK</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>⚡</span>MARKET</div>
         <div class="nav-item" onclick="sh(this,'rank-s')"><span>🏆</span>RANK</div>
     </nav>
 
     <script>
-        const tg = window.Telegram.WebApp; tg.expand();
-        
-        // Fotoğrafları Ayarlar'dan yükle
-        document.getElementById('main-coin').src = AYARLAR.coinFoto;
-        document.getElementById('boss-img').src = AYARLAR.bossFoto;
-        document.getElementById('skin-img-classic').src = AYARLAR.coinFoto;
-        document.getElementById('skin-img-diamond').src = AYARLAR.diamondSkinFoto;
-
-        // Veriler (Database olmadığı için LocalStorage)
+        // Başlangıç Değişkenleri
         let b = parseFloat(localStorage.getItem('b')) || 0;
         let e = parseInt(localStorage.getItem('e')) || 500;
         let maxE = parseInt(localStorage.getItem('maxE')) || 500;
         let clickLv = parseInt(localStorage.getItem('clickLv')) || 1;
-        let lv = parseInt(localStorage.getItem('lv')) || 1;
         let a = parseFloat(localStorage.getItem('a')) || 0;
-        let lastClaim = localStorage.getItem('lastClaim') || 0;
-        let dayCount = parseInt(localStorage.getItem('dayCount')) || 0;
-        let currentSkin = localStorage.getItem('currentSkin') || 'classic';
-        let ownedSkins = JSON.parse(localStorage.getItem('ownedSkins')) || ['classic'];
-        let walletConnected = localStorage.getItem('walletConnected') === 'true';
+        let wallet = localStorage.getItem('wallet') === 'true';
 
-        let combo = 0; let comboTimer; let turbo = false; let b_hp = 100;
-        let costs = { re: 2500, ai: 20000, click: 500, energy: 1000 };
-        const syms = ['💎', '💰', '🌟', '7️⃣', '🍒'];
-
-        // Telegram Kullanıcı Adı
-        const user = tg.initDataUnsafe?.user;
-        document.getElementById('tg-name').innerText = user ? (user.username || user.first_name) : "Misafir";
-
+        // UI Güncelleme
         function up() {
-            let nxt = 5000 * Math.pow(lv, 2);
             document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
-            document.getElementById('my-rank-val').innerText = Math.floor(b).toLocaleString();
-            document.getElementById('passive-inc').innerText = `+${a.toFixed(1)} / sn`;
-            document.getElementById('en-fill').style.width = (e / maxE * 100) + "%";
+            document.getElementById('passive-inc').innerText = `+${a.toFixed(1)}/sn`;
             document.getElementById('en-text').innerText = `${e}/${maxE}`;
-            document.getElementById('level-fill').style.width = Math.min((b/nxt)*100, 100) + "%";
-            document.getElementById('lv-text').innerText = `LEVEL ${lv} - HEDEF: ${nxt.toLocaleString()}`;
+            document.getElementById('en-fill').style.width = (e / maxE * 100) + "%";
+            document.getElementById('my-rank-val').innerText = Math.floor(b).toLocaleString();
             
-            document.getElementById('c-click').innerText = `Lv ${clickLv} | ${costs.click.toLocaleString()}`;
-            document.getElementById('c-energy').innerText = `+50 | ${costs.energy.toLocaleString()}`;
-
-            // Skin durumlarını güncelle
-            document.getElementById('main-coin').src = currentSkin === 'diamond' ? AYARLAR.diamondSkinFoto : AYARLAR.coinFoto;
-            document.querySelectorAll('.grid-box').forEach(el => el.classList.remove('active'));
-            document.getElementById('skin-' + currentSkin).classList.add('active');
-            if(ownedSkins.includes('diamond')) document.getElementById('skin-diamond').innerHTML = `<img src="${AYARLAR.diamondSkinFoto}" width="40"><br>Elmas`;
-
-            // Cüzdan durumunu güncelle
-            if(walletConnected) {
-                document.getElementById('wallet-status').innerText = "UQAz...8X9k"; // Fake adres
-                document.getElementById('wallet-status').style.color = var(--green);
-                document.getElementById('wallet-connect-btn').innerText = "BAĞLI";
-                document.getElementById('wallet-connect-btn').disabled = true;
+            if(wallet) {
+                document.getElementById('w-status').innerText = "UQAz...8X9k";
+                document.getElementById('w-btn').innerText = "BAĞLI";
+                document.getElementById('w-btn').disabled = true;
             }
-
-            if(b >= nxt) { lv++; b += 5000; tg.HapticFeedback.notificationOccurred('success'); alert("LEVEL UP!"); }
-            if(Math.random() > 0.99 && !turbo) document.getElementById('turbo-btn').style.display = "block";
             save();
         }
 
-        // CÜZDAN BAĞLAMA (Fake)
-        function connectWallet() {
-            const btn = document.getElementById('wallet-connect-btn');
-            btn.innerText = "BAĞLANIYOR...";
-            setTimeout(() => {
-                walletConnected = true;
-                localStorage.setItem('walletConnected', 'true');
-                tg.HapticFeedback.notificationOccurred('success');
-                alert("TON Cüzdan Başarıyla Bağlandı!");
-                up();
-            }, 2000);
-        }
-
-        // TIKLAMA MANTIĞI
+        // Tıklama
         function clickCoin(ev) {
             if(e >= clickLv) {
-                combo++; clearTimeout(comboTimer);
-                document.getElementById('combo-wrap').classList.add('combo-active');
-                document.getElementById('combo-val').innerText = combo;
-                comboTimer = setTimeout(() => { combo = 0; document.getElementById('combo-wrap').classList.remove('combo-active'); }, 1200);
-
-                let gain = (clickLv + Math.floor(combo / 15)) * (turbo ? 5 : 1);
-                b += gain; e -= clickLv;
-                tg.HapticFeedback.impactOccurred('medium');
-
-                const ft = document.createElement('div');
-                ft.className = 'floating-text'; ft.innerText = `+${gain}`;
-                ft.style.left = `${ev.clientX - 20}px`; ft.style.top = `${ev.clientY - 40}px`;
-                document.body.appendChild(ft);
-                setTimeout(() => ft.remove(), 600);
+                b += clickLv; e -= clickLv;
+                createFloatingText(ev);
                 up();
-            } else tg.HapticFeedback.notificationOccurred('error');
+            }
         }
 
+        // Yükseltme
         function upgrade(type) {
-            if(b >= costs[type]) {
-                b -= costs[type];
-                if(type === 'click') clickLv++; else maxE += 50;
-                costs[type] = Math.floor(costs[type] * 1.6);
-                tg.HapticFeedback.notificationOccurred('success'); up();
-            }
+            let cost = type === 'click' ? (clickLv * 500) : (maxE * 2);
+            if(b >= cost) {
+                b -= cost;
+                if(type === 'click') clickLv++; else maxE += 100;
+                up();
+            } else { alert("Yetersiz bakiye!"); }
         }
 
-        // GÜNLÜK ÖDÜL
-        const dailyRewards = [1000, 3000, 7500, 15000, 30000, 60000, 150000];
-        function initDaily() {
-            const list = document.getElementById('daily-list'); list.innerHTML = '';
-            dailyRewards.forEach((amt, i) => {
-                const box = document.createElement('div');
-                box.className = `grid-box ${i < dayCount ? 'claimed' : (i === dayCount ? 'active' : '')}`;
-                box.innerHTML = `GÜN ${i+1}<br><b>${(amt/1000).toFixed(0)}K</b>`;
-                list.appendChild(box);
-            });
-            if(Date.now() - lastClaim < 86400000) {
-                const btn = document.getElementById('daily-btn');
-                btn.disabled = true; btn.innerText = "YARIN TEKRAR GEL"; btn.style.background = "#222";
-            }
-        }
-        function claimDaily() {
-            b += dailyRewards[dayCount]; dayCount = (dayCount + 1) % 7; lastClaim = Date.now();
-            localStorage.setItem('lastClaim', lastClaim); localStorage.setItem('dayCount', dayCount);
-            tg.HapticFeedback.notificationOccurred('success'); initDaily(); up();
-        }
-
-        function setSkin(s) { if(ownedSkins.includes(s)) { currentSkin = s; up(); } }
-        function buySkin(s, c) {
-            if(ownedSkins.includes(s)) { setSkin(s); return; }
-            if(b >= c) { b -= c; ownedSkins.push(s); currentSkin = s; localStorage.setItem('ownedSkins', JSON.stringify(ownedSkins)); alert("Yeni Skin Açıldı!"); up(); }
-        }
-
-        // ÇARK SİSTEMİ
-        const rew = ["0", "2000", "5000", "İFLAS", "10000", "1000", "25000", "500"];
-        const cols = ["#f1c40f","#e67e22","#e74c3c","#222","#9b59b6","#3498db","#2ecc71","#1abc9c"];
-        let rot = 0;
-        function spinWheel() {
-            if(b < 1000 || document.getElementById('wheel-btn').disabled) return;
-            b -= 1000; document.getElementById('wheel-btn').disabled = true;
-            let add = (360 * 6) + Math.floor(Math.random() * 360); rot += add;
-            document.getElementById('wheel').style.transform = `rotate(${rot}deg)`;
+        // Cüzdan Bağlama
+        function connectWallet() {
+            document.getElementById('w-btn').innerText = "...";
             setTimeout(() => {
-                let idx = Math.floor(((360 - (rot % 360) + 22.5) % 360) / 45);
-                let res = rew[idx % 8];
-                if(res === "İFLAS") { b = 0; tg.HapticFeedback.notificationOccurred('error'); alert("İFLAS! Bakiyen Sıfırlandı."); }
-                else { b += parseInt(res); tg.HapticFeedback.notificationOccurred('success'); }
-                document.getElementById('wheel-btn').disabled = false; up();
-            }, 5100);
+                wallet = true;
+                localStorage.setItem('wallet', 'true');
+                up();
+                alert("Cüzdan bağlandı!");
+            }, 1500);
         }
 
-        // SLOT
-        function playSlot() {
-            if(b < 2500 || document.getElementById('slot-btn').disabled) return;
-            b -= 2500; document.getElementById('slot-btn').disabled = true;
-            let spins = [0,0,0];
-            [1,2,3].forEach((id, i) => {
-                let iv = setInterval(() => {
-                    document.getElementById('s'+id).innerText = syms[Math.floor(Math.random()*syms.length)]; spins[i]++;
-                    if(spins[i] > 15 + i*8) {
-                        clearInterval(iv);
-                        if(i===2) {
-                            let r1=document.getElementById('s1').innerText, r2=document.getElementById('s2').innerText, r3=document.getElementById('s3').innerText;
-                            if(r1===r2 && r2===r3) { b+=100000; tg.HapticFeedback.notificationOccurred('success'); alert("JACKPOT! +100.000"); }
-                            document.getElementById('slot-btn').disabled=false; up();
-                        }
-                    }
-                }, 60);
-            });
+        // Yardımcı Fonksiyonlar
+        function createFloatingText(ev) {
+            const ft = document.createElement('div');
+            ft.className = 'floating-text';
+            ft.innerText = `+${clickLv}`;
+            ft.style.left = `${ev.clientX}px`;
+            ft.style.top = `${ev.clientY}px`;
+            document.body.appendChild(ft);
+            setTimeout(() => ft.remove(), 600);
         }
 
-        // BOSS SAVAŞI
-        function startBoss() {
-            if(b < 5000) return alert("Giriş için 5.000 Altın gerekiyor!");
-            b -= 5000; b_hp = 100; document.getElementById('boss-ui').style.display="flex";
-            let t = 30;
-            let iv = setInterval(() => {
-                t--; document.getElementById('boss-timer').innerText = t+"s";
-                if(t<=0 || b_hp<=0) {
-                    clearInterval(iv);
-                    if(b_hp<=0) { b += 50000; tg.HapticFeedback.notificationOccurred('success'); alert("BOSS YENİLDİ! +50K"); }
-                    else { tg.HapticFeedback.notificationOccurred('error'); alert("Süre bitti, Boss kaçtı!"); }
-                    document.getElementById('boss-ui').style.display="none"; up();
-                }
-            }, 1000);
+        function save() {
+            localStorage.setItem('b', b);
+            localStorage.setItem('e', e);
+            localStorage.setItem('maxE', maxE);
+            localStorage.setItem('clickLv', clickLv);
         }
-        function hitBoss() { b_hp -= 4; document.getElementById('boss-hp').style.width = b_hp + "%"; tg.HapticFeedback.impactOccurred('heavy'); }
 
-        function buy(id, p) { if(b >= costs[id]){ b -= costs[id]; a += p; costs[id] = Math.floor(costs[id]*1.4); up(); } }
-        function shareGame() { tg.openTelegramLink(`https://t.me/share/url?url=${AYARLAR.botLink}&text=Benimle ESSE STUDIO oyna!`); }
-        function activateTurbo() { turbo=true; document.getElementById('turbo-btn').style.display="none"; document.getElementById('coin-wrapper').style.filter="hue-rotate(180deg) contrast(2)"; setTimeout(()=>{turbo=false; document.getElementById('coin-wrapper').style.filter=""}, 10000); }
-        function save() { localStorage.setItem('b',b); localStorage.setItem('lv',lv); localStorage.setItem('e',e); localStorage.setItem('maxE',maxE); localStorage.setItem('clickLv',clickLv); localStorage.setItem('currentSkin',currentSkin); }
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         function sh(el, id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active-screen'); el.classList.add('active');
-            if(id === 'side-menu') toggleMenu();
+            document.getElementById(id).classList.add('active-screen');
+            el.classList.add('active');
         }
 
-        function drawW() {
-            const c=document.getElementById('wheel'); const x=c.getContext('2d'); x.clearRect(0,0,280,280);
-            rew.forEach((t, i) => {
-                x.beginPath(); x.fillStyle=cols[i]; x.moveTo(140,140);
-                x.arc(140,140,135, i*(Math.PI/4), (i+1)*(Math.PI/4)); x.fill();
-                x.save(); x.translate(140,140); x.rotate(i*(Math.PI/4)+Math.PI/8);
-                x.fillStyle="white"; x.font="bold 14px Montserrat"; x.fillText(t, 65, 5); x.restore();
-            });
-        }
+        // Döngüler
+        setInterval(() => {
+            if(e < maxE) e++;
+            up();
+        }, 1000);
 
-        setInterval(() => { b += a/10; if(e < maxE) e++; up(); }, 100);
-        drawW(); initDaily(); up();
+        // Telegram WebApp Başlat
+        window.onload = () => {
+            if(window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.expand();
+            }
+            up();
+        };
     </script>
 </body>
 </html>
