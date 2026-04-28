@@ -34,7 +34,7 @@
         .side-menu.open { right: 0; }
         .menu-btn { position: fixed; right: 10px; top: 60px; background: var(--gold); color: black; border: none; padding: 12px; border-radius: 50%; font-weight: bold; z-index: 3001; font-size: 18px; }
 
-        /* MARKET & DİĞERLERİ */
+        /* KARTLAR VE KUTULAR */
         .wallet-box { background: #111; padding: 15px; border-radius: 12px; border: 1px dashed var(--blue); margin-bottom: 20px; }
         .wheel-wrap { position: relative; width: 280px; height: 280px; margin: 20px auto; }
         #wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); }
@@ -46,12 +46,15 @@
         .card { background: #0a0a0a; padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid #222; }
         .btn-act { background: var(--gold); border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; color: black; width: 100%; font-size: 14px; }
         
-        /* BOSS & NAV */
+        /* BOSS UI */
         #boss-ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* NAV BAR */
         .nav { position: fixed; bottom: 10px; width: 96%; left: 2%; background: rgba(10,10,10,0.98); border-radius: 20px; display: flex; padding: 12px; z-index: 100; border: 1px solid #333; }
         .nav-item { flex: 1; text-align: center; color: #444; font-size: 8px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
         .nav-item span { display: block; font-size: 22px; margin-bottom: 2px; }
+
         #main-coin { width: 220px; cursor: pointer; transition: transform 0.05s; filter: drop-shadow(0 0 20px rgba(255,207,37,0.2)); }
         #main-coin:active { transform: scale(0.92); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -153,7 +156,7 @@
         let costs = { re: 2500, ai: 18000 };
         const syms = ['🍒', '💎', '💰', '7️⃣', '🌟'];
 
-        // Telegram Kullanıcı Bilgisi
+        // Kullanıcı Bilgisi
         const user = tg.initDataUnsafe?.user;
         const userName = user ? (user.username || user.first_name) : "Oyuncu";
         document.getElementById('tg-name').innerText = userName;
@@ -183,7 +186,6 @@
                 b += gain; e -= 3;
                 tg.HapticFeedback.impactOccurred('medium');
                 
-                // Yüzen Yazı
                 const ft = document.createElement('div');
                 ft.className = 'floating-text';
                 ft.innerText = `+${gain}`;
@@ -198,14 +200,7 @@
             }
         }
 
-        function activateTurbo() { 
-            turbo=true; 
-            document.getElementById('turbo-btn').style.display="none";
-            document.getElementById('main-coin').style.filter="hue-rotate(180deg) contrast(2) drop-shadow(0 0 20px red)"; 
-            setTimeout(()=>{turbo=false; document.getElementById('main-coin').style.filter=""}, 10000); 
-        }
-
-        // --- ÇARK, SLOT VE DİĞER FONKSİYONLAR (AYNEN KORUNDU) ---
+        // --- ÇARK SİSTEMİ (DÜZELTİLMİŞ) ---
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const rew = ["0", "500", "1000", "İFLAS", "5000", "2000", "10000", "0"];
@@ -224,38 +219,75 @@
 
         let rot = 0;
         function spinWheel() {
-            let btn = document.getElementById('wheel-btn'); btn.disabled = true;
-            let add = Math.floor(Math.random() * 360) + 2520;
-            rot += add; canvas.style.transform = `rotate(${rot}deg)`;
+            let btn = document.getElementById('wheel-btn');
+            if(btn.disabled) return;
+            btn.disabled = true;
+
+            let randomAdd = Math.floor(Math.random() * 360);
+            let totalAdd = (360 * 7) + randomAdd; // 7 Tur
+            rot += totalAdd;
+            
+            canvas.style.transform = `rotate(${rot}deg)`;
+            
             setTimeout(() => {
-                let actual = (360 - (rot % 360)) % 360;
-                let idx = Math.floor(actual / (360 / rew.length));
-                let res = rew[idx];
-                if(res === "İFLAS") { b=0; alert("EYVAH! Bakiyen Sıfırlandı!"); }
-                else { b += parseInt(res); alert("ÇARK: +" + res); }
+                let actualDeg = rot % 360;
+                let arc = 360 / rew.length;
+                // Ok üstte olduğu için hesaplamayı normalize ediyoruz
+                let winningIndex = Math.floor(((360 - actualDeg + (arc / 2)) % 360) / arc);
+                winningIndex = (winningIndex + rew.length) % rew.length;
+                
+                let res = rew[winningIndex];
+                if(res === "İFLAS") {
+                    b = 0; 
+                    tg.HapticFeedback.notificationOccurred('error');
+                    alert("EYVAH! Bakiyen Sıfırlandı!");
+                } else {
+                    let win = parseInt(res);
+                    b += win;
+                    tg.HapticFeedback.notificationOccurred('success');
+                    alert("KAZANDIN: " + win + " Altın!");
+                }
                 btn.disabled = false; up();
-            }, 5200);
+            }, 5100);
         }
 
+        // --- SLOT SİSTEMİ (DÜZELTİLMİŞ) ---
         function playSlot() {
             if(b < 2500) return alert("Yetersiz Altın!");
             b -= 2500; document.getElementById('slot-btn').disabled = true;
-            let spins = [0,0,0];
-            [1,2,3].forEach((id, i) => {
+            let spins = [0, 0, 0];
+            [1, 2, 3].forEach((id, i) => {
                 let iv = setInterval(() => {
-                    document.getElementById('s'+id).innerText = syms[Math.floor(Math.random()*syms.length)];
+                    document.getElementById('s' + id).innerText = syms[Math.floor(Math.random() * syms.length)];
                     spins[i]++;
-                    if(spins[i] > 20 + i*10) { clearInterval(iv); if(i===2) finalizeSlot(); }
+                    if(spins[i] > 20 + i * 10) {
+                        clearInterval(iv);
+                        if(i === 2) {
+                            // Slot durduğunda kontrol et
+                            let res1 = document.getElementById('s1').innerText;
+                            let res2 = document.getElementById('s2').innerText;
+                            let res3 = document.getElementById('s3').innerText;
+                            
+                            if(res1 === res2 && res2 === res3) {
+                                b += 75000;
+                                tg.HapticFeedback.notificationOccurred('success');
+                                alert("JACKPOT! +75.000");
+                            } else {
+                                tg.HapticFeedback.impactOccurred('light');
+                            }
+                            document.getElementById('slot-btn').disabled = false; 
+                            up();
+                        }
+                    }
                 }, 50);
             });
         }
 
-        function finalizeSlot() {
-            let s1 = document.getElementById('s1').innerText;
-            let s2 = document.getElementById('s2').innerText;
-            let s3 = document.getElementById('s3').innerText;
-            if(s1 === s2 && s2 === s3) { b += 75000; alert("3'te 3! +75.000"); }
-            document.getElementById('slot-btn').disabled = false; up();
+        function activateTurbo() { 
+            turbo=true; 
+            document.getElementById('turbo-btn').style.display="none";
+            document.getElementById('main-coin').style.filter="hue-rotate(180deg) contrast(2) drop-shadow(0 0 20px red)"; 
+            setTimeout(()=>{turbo=false; document.getElementById('main-coin').style.filter=""}, 10000); 
         }
 
         function startBoss() {
@@ -274,7 +306,7 @@
         function hitBoss() { b_hp -= 4; tg.HapticFeedback.impactOccurred('heavy'); document.getElementById('boss-hp').style.width = b_hp + "%"; }
         function buy(id, p) { if(b >= costs[id]){ b -= costs[id]; a += p; costs[id] *= 1.3; up(); } }
         function trade(t) { if(t==='buy' && b>=s_price){ b-=s_price; } if(t==='sell'){ b+=parseFloat(s_price); } up(); }
-        function shareGame() { tg.openTelegramLink("https://t.me/share/url?url=https://t.me/SizinBotLinkiniz&text=Benimle oyna!"); }
+        function shareGame() { tg.openTelegramLink("https://t.me/share/url?url=https://t.me/SizinBotLinkiniz&text=Benimle ESSE STUDIO oyna!"); }
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); }
         function sh(el, id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
