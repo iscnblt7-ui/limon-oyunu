@@ -3,186 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Money Clicker: God Mode</title>
+    <title>Money Clicker: Empire Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffcf25; --fire: #ff4500; --bg: #050505; }
+        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; }
         body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* HEADER */
-        .header { padding: 20px; text-align: center; }
-        #balance { font-size: 55px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,207,37,0.4); }
-        #combo-badge { font-size: 18px; color: var(--fire); font-weight: 900; opacity: 0; transition: 0.2s; }
+        /* HEADER & LANG */
+        .top-bar { display: flex; justify-content: space-between; padding: 10px 20px; font-size: 10px; color: #555; }
+        .lang-btn { background: #111; border: 1px solid #333; color: var(--gold); padding: 3px 8px; border-radius: 5px; cursor: pointer; }
+        .header { text-align: center; padding: 10px; }
+        #balance { font-size: 48px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,207,37,0.3); }
 
         /* SCREENS */
         .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .active-screen { display: flex; animation: slideUp 0.3s ease-out; }
+        .active-screen { display: flex; animation: fadeIn 0.3s; }
 
-        /* CLICKER */
-        .coin-wrap { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; margin: 30px 0; }
-        #main-coin { width: 220px; filter: drop-shadow(0 0 30px rgba(255,207,37,0.2)); transition: transform 0.05s; cursor: pointer; }
+        /* COIN & BOOST */
+        .coin-area { position: relative; margin: 20px 0; }
+        #main-coin { width: 220px; transition: 0.05s; cursor: pointer; filter: drop-shadow(0 0 20px rgba(255,207,37,0.2)); }
         #main-coin:active { transform: scale(0.9); }
+        .boost-btn { background: linear-gradient(45deg, #ff4500, #ff8c00); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 900; margin-top: 15px; box-shadow: 0 0 20px rgba(255,69,0,0.4); cursor: pointer; display: none; }
 
         /* CARDS */
-        .card { background: #111; border: 1px solid #222; border-radius: 20px; padding: 15px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; }
-        .card-icon { font-size: 24px; margin-right: 15px; background: #1a1a1a; padding: 10px; border-radius: 12px; }
-        .card-content { flex-grow: 1; }
-        .btn-buy { background: var(--gold); color: black; border: none; padding: 10px 15px; border-radius: 12px; font-weight: bold; }
+        .card { background: #111; border: 1px solid #222; border-radius: 18px; padding: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; }
+        .card-info { flex: 1; margin-left: 15px; }
+        .card-info h4 { font-size: 14px; color: var(--gold); }
+        .card-info p { font-size: 10px; color: #666; }
+        .buy-btn { background: var(--gold); border: none; padding: 8px 12px; border-radius: 10px; font-weight: bold; font-size: 12px; }
 
-        /* LEADERBOARD */
-        .leader-item { display: flex; justify-content: space-between; width: 100%; padding: 12px; border-bottom: 1px solid #222; font-size: 14px; }
-        .rank-num { color: var(--gold); font-weight: bold; width: 30px; }
-
-        /* NAVIGATION */
-        .nav { position: fixed; bottom: 15px; width: 92%; left: 4%; background: rgba(15,15,15,0.9); backdrop-filter: blur(15px); border-radius: 20px; display: flex; padding: 10px; border: 1px solid #333; }
-        .nav-item { flex: 1; text-align: center; color: #555; font-size: 10px; transition: 0.3s; cursor: pointer; }
+        /* NAV */
+        .nav { position: fixed; bottom: 15px; width: 94%; left: 3%; background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); border-radius: 25px; display: flex; padding: 12px; border: 1px solid #222; }
+        .nav-item { flex: 1; text-align: center; color: #444; font-size: 9px; }
         .nav-item.active { color: var(--gold); }
-        .nav-item span { font-size: 22px; display: block; }
+        .nav-item span { display: block; font-size: 22px; margin-bottom: 3px; }
 
-        /* PARTICLES & COMBO */
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .float-val { position: absolute; font-weight: 900; color: white; pointer-events: none; animation: floatUp 0.6s forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
-        
-        .energy-box { width: 80%; margin-top: 20px; }
-        .bar-outer { width: 100%; height: 10px; background: #1a1a1a; border-radius: 5px; margin-top: 8px; overflow: hidden; }
-        #bar-inner { width: 100%; height: 100%; background: linear-gradient(90deg, var(--gold), #ff8c00); }
+        /* ANIMATIONS */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .f-text { position: absolute; font-weight: 900; pointer-events: none; animation: floatUp 0.6s forwards; color: white; }
+        @keyframes floatUp { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-100px); } }
+        .turbo-mode { animation: shake 0.1s infinite; filter: hue-rotate(45deg) brightness(1.5) !important; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } }
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <span id="rank-label">RANK: NOOB</span>
+        <button class="lang-btn" onclick="toggleLang()">TR / EN</button>
+    </div>
+
     <div class="header">
         <div id="balance">0</div>
-        <div id="combo-badge">COMBO X1</div>
+        <div id="status-text" style="font-size: 10px; color: #ff4500; font-weight: bold;"></div>
     </div>
 
     <div id="game-s" class="screen active-screen">
-        <div class="coin-wrap">
+        <div class="coin-area">
             <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin">
         </div>
-        <div class="energy-box">
-            <div style="display:flex; justify-content:space-between; font-size:11px">
-                <span>⚡ GÜÇ</span>
-                <span id="en-stat">500 / 500</span>
+        <button class="boost-btn" id="boost-btn" onclick="activateTurbo()">TURBO BOOST! (x5)</button>
+        <div style="width:80%; margin-top:20px">
+            <div style="display:flex; justify-content:space-between; font-size:10px"><span>⚡ ENERGY</span><span id="en-stat">500/500</span></div>
+            <div style="height:6px; background:#222; border-radius:5px; overflow:hidden; margin-top:5px">
+                <div id="en-fill" style="height:100%; background:var(--gold); width:100%"></div>
             </div>
-            <div class="bar-outer"><div id="bar-inner"></div></div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h2 style="margin-bottom:20px">Market</h2>
+        <h3 style="margin-bottom:15px">Geliştir & Yatırım</h3>
         <div class="card">
-            <div class="card-icon">⚡</div>
-            <div class="card-content"><h4>Multi-Tık</h4><p id="mt-p">Maliyet: 200</p></div>
-            <button class="btn-buy" onclick="buy('mt')">GELİŞTİR</button>
+            <span>👆</span>
+            <div class="card-info"><h4>Multi-Tık</h4><p id="mt-p">Maliyet: 200</p></div>
+            <button class="buy-btn" onclick="buy('mt')">YÜKSELT</button>
         </div>
         <div class="card">
-            <div class="card-icon">🤖</div>
-            <div class="card-content"><h4>Oto Madenci</h4><p id="au-p">Maliyet: 1000</p></div>
-            <button class="btn-buy" onclick="buy('au')">SATIN AL</button>
+            <span>🏢</span>
+            <div class="card-info"><h4>Gayrimenkul</h4><p id="au-p">Pasif: +5/sn | Maliyet: 2000</p></div>
+            <button class="buy-btn" onclick="buy('au')">YATIRIM</button>
+        </div>
+        <div class="card">
+            <span>⛏️</span>
+            <div class="card-info"><h4>BTC Çiftliği</h4><p id="btc-p">Pasif: +20/sn | Maliyet: 10000</p></div>
+            <button class="buy-btn" onclick="buy('btc')">SATIN AL</button>
         </div>
     </div>
 
     <div id="task-s" class="screen">
-        <h2>Görevler</h2>
-        <div class="card" style="margin-top:20px">
-            <div class="card-icon">📺</div>
-            <div class="card-content"><h4>YouTube</h4><p>Abone Ol +50.000</p></div>
-            <button class="btn-buy" onclick="task('yt')">YAP</button>
+        <h3>Ödül Merkezi</h3>
+        <div class="card" style="margin-top:20px; border: 1px solid var(--fire)">
+            <span>🎡</span>
+            <div class="card-info"><h4>Şans Çarkı</h4><p>Günde 1 kez çevir!</p></div>
+            <button class="buy-btn" id="spin-btn" onclick="spinWheel()">ÇEVİR</button>
         </div>
         <div class="card">
-            <div class="card-icon">📸</div>
-            <div class="card-content"><h4>Instagram</h4><p>Takip Et +30.000</p></div>
-            <button class="btn-buy" onclick="task('ig')">YAP</button>
+            <span>📢</span>
+            <div class="card-info"><h4>Referans</h4><p>Arkadaş Başı +25,000</p></div>
+            <button class="buy-btn" onclick="Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=t.me/BOTUN')">DAVET</button>
         </div>
     </div>
 
-    <div id="rank-s" class="screen">
-        <h2>Dünya Sıralaması</h2>
-        <div style="width:100%; margin-top:20px">
-            <div class="leader-item"><span class="rank-num">1.</span> <span>CryptoKing</span> <span>99.2M</span></div>
-            <div class="leader-item"><span class="rank-num">2.</span> <span>ElonMusk_v2</span> <span>85.1M</span></div>
-            <div class="leader-item"><span class="rank-num">3.</span> <span>SeninAdın</span> <span id="my-rank-val">0</span></div>
-            <div class="leader-item" style="opacity:0.5"><span class="rank-num">4.</span> <span>Limoncu</span> <span>12.5K</span></div>
+    <div id="wallet-s" class="screen">
+        <h3>Varlıklarım</h3>
+        <div style="background:linear-gradient(45deg, #111, #000); padding:30px; border-radius:25px; width:100%; text-align:center; border:1px solid #333; margin-top:20px">
+            <div style="font-size:40px">💎</div>
+            <h3 style="margin-top:10px">TON CONNECT</h3>
+            <p style="font-size:11px; color:#555; margin:15px 0">Kazançlarını çekmek için cüzdanını bağla.</p>
+            <button class="buy-btn" style="width:100%" onclick="alert('Yakında!')">CÜZDAN BAĞLA</button>
         </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item active" onclick="nav(this,'game-s')"><span>🏠</span>Ana Sayfa</div>
-        <div class="nav-item" onclick="nav(this,'market-s')"><span>⛏️</span>Market</div>
-        <div class="nav-item" onclick="nav(this,'task-s')"><span>📋</span>Görevler</div>
-        <div class="nav-item" onclick="nav(this,'rank-s')"><span>🏆</span>Sıralama</div>
-    </div>
-
-    <audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-37.mp3"></audio>
+    <nav class="nav">
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>🏠</span>ANA SAYFA</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>⛏️</span>MARKET</div>
+        <div class="nav-item" onclick="sh(this,'task-s')"><span>📋</span>GÖREV</div>
+        <div class="nav-item" onclick="sh(this,'wallet-s')"><span>💎</span>CÜZDAN</div>
+    </nav>
 
     <script>
-        let bal = parseFloat(localStorage.getItem('bal')) || 0;
-        let en = parseInt(localStorage.getItem('en')) || 500;
-        let mt = parseInt(localStorage.getItem('mt')) || 1;
-        let au = parseFloat(localStorage.getItem('au')) || 0;
-        let combo = 0;
-        let lastT = 0;
+        let b = parseFloat(localStorage.getItem('b')) || 0;
+        let e = parseInt(localStorage.getItem('e')) || 500;
+        let m = parseInt(localStorage.getItem('m')) || 1;
+        let a = parseFloat(localStorage.getItem('a')) || 0;
+        let turbo = false;
 
         function update() {
-            document.getElementById('balance').innerText = Math.floor(bal).toLocaleString();
-            document.getElementById('en-stat').innerText = `${en} / 500`;
-            document.getElementById('bar-inner').style.width = (en/5) + "%";
-            document.getElementById('mt-p').innerText = `Maliyet: ${mt*200}`;
-            document.getElementById('au-p').innerText = `Maliyet: ${(au+1)*1000}`;
-            document.getElementById('my-rank-val').innerText = Math.floor(bal).toLocaleString();
+            document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
+            document.getElementById('en-stat').innerText = `${e}/500`;
+            document.getElementById('en-fill').style.width = (e/5) + "%";
+            document.getElementById('mt-p').innerText = `Maliyet: ${m*200}`;
+            document.getElementById('au-p').innerText = `Pasif: +${(a*10).toFixed(1)}/sn | Maliyet: 2000`;
+            
+            if(b > 1000) document.getElementById('boost-btn').style.display = "block";
             save();
         }
 
-        document.getElementById('main-coin').onclick = (e) => {
-            if(en >= mt) {
-                let now = Date.now();
-                if(now - lastT < 300) combo++; else combo = 1;
-                lastT = now;
-
-                let multiplier = combo > 10 ? 2 : 1;
-                let gain = mt * multiplier;
-                
-                bal += gain; en -= mt;
-                
-                if(combo > 5) {
-                    document.getElementById('combo-badge').style.opacity = 1;
-                    document.getElementById('combo-badge').innerText = `COMBO X${multiplier}`;
-                } else {
-                    document.getElementById('combo-badge').style.opacity = 0;
-                }
-
-                // Efekt ve Ses
-                spawn(e.clientX, e.clientY, "+"+gain);
-                document.getElementById('click-sound').currentTime = 0;
-                document.getElementById('click-sound').play().catch(()=>{});
-                
-                if(window.Telegram.WebApp.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        document.getElementById('main-coin').onclick = (ev) => {
+            if(e >= m) {
+                let gain = turbo ? m * 5 : m;
+                b += gain; e -= m;
+                spawn(ev.clientX, ev.clientY, "+"+gain);
+                if(window.Telegram.WebApp.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
                 update();
             }
         };
 
-        function spawn(x, y, val) {
+        function activateTurbo() {
+            if(turbo) return;
+            turbo = true;
+            document.getElementById('main-coin').classList.add('turbo-mode');
+            document.getElementById('status-text').innerText = "TURBO AKTİF! x5 KAZANÇ";
+            setTimeout(() => {
+                turbo = false;
+                document.getElementById('main-coin').classList.remove('turbo-mode');
+                document.getElementById('status-text').innerText = "";
+            }, 15000);
+        }
+
+        function spinWheel() {
+            let win = Math.floor(Math.random() * 10000);
+            b += win;
+            alert("Tebrikler! Çarktan " + win + " para kazandın!");
+            document.getElementById('spin-btn').disabled = true;
+            update();
+        }
+
+        function buy(t) {
+            if(t === 'mt' && b >= m*200) { b -= m*200; m++; }
+            if(t === 'au' && b >= 2000) { b -= 2000; a += 0.5; }
+            if(t === 'btc' && b >= 10000) { b -= 10000; a += 2; }
+            update();
+        }
+
+        function spawn(x, y, v) {
             const d = document.createElement('div');
-            d.innerText = val; d.className = 'float-val';
+            d.innerText = v; d.className = 'f-text';
             d.style.left = x + 'px'; d.style.top = y + 'px';
             document.body.appendChild(d); setTimeout(()=>d.remove(), 600);
         }
 
-        function buy(type) {
-            if(type === 'mt' && bal >= mt*200) { bal -= mt*200; mt++; }
-            if(type === 'au' && bal >= (au+1)*1000) { bal -= (auto+1)*1000; au += 0.5; }
-            update();
-        }
-
-        function task(t) {
-            alert("Görev Tamamlandı! +30,000");
-            bal += 30000; update();
-        }
-
-        function nav(el, id) {
+        function sh(el, id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(id).classList.add('active-screen');
@@ -190,11 +193,11 @@
         }
 
         function save() {
-            localStorage.setItem('bal', bal); localStorage.setItem('en', en);
-            localStorage.setItem('mt', mt); localStorage.setItem('au', au);
+            localStorage.setItem('b', b); localStorage.setItem('e', e);
+            localStorage.setItem('m', m); localStorage.setItem('a', a);
         }
 
-        setInterval(() => { bal += (au/10); if(en < 500) en++; update(); }, 100);
+        setInterval(() => { b += (a/10); if(e < 500) e++; update(); }, 100);
         window.Telegram.WebApp.expand();
         update();
     </script>
