@@ -6,16 +6,16 @@
     <title>Limon Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: #f0f0f0; text-align: center; font-family: sans-serif; padding-top: 50px; }
-        #lemon { width: 200px; cursor: pointer; transition: transform 0.1s; }
-        #lemon:active { transform: scale(0.9); }
-        h1 { color: #333; }
-        .score { font-size: 24px; font-weight: bold; margin-top: 20px; }
+        body { background-color: #f7f7f7; text-align: center; font-family: 'Arial', sans-serif; padding-top: 50px; user-select: none; }
+        #lemon { width: 180px; cursor: pointer; transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
+        #lemon:active { transform: scale(0.85); }
+        h1 { color: #333; margin-bottom: 20px; }
+        .score { font-size: 32px; font-weight: bold; color: #ffcc00; text-shadow: 1px 1px 2px #000; }
     </style>
 </head>
 <body>
     <h1>Limonu Tıkla!</h1>
-    <img id="lemon" src="https://www.svgrepo.com/show/406603/lemon.svg" alt="Limon">
+    <img id="lemon" src="https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f34b.png" alt="Limon">
     <div class="score">Puan: <span id="score-val">0</span></div>
 
     <script>
@@ -26,9 +26,12 @@
         lemonElem.onclick = () => {
             score++;
             scoreElem.innerText = score;
+            // Hafif titreşim (Telegram destekleyen cihazlarda)
+            if (window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
         };
 
-        // Telegram için hazırla
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
     </script>
