@@ -1,140 +1,209 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ESSE STUDIO: Ultra Neon</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ESSE STUDIO: Galactic Empire</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; --glass: rgba(255, 255, 255, 0.05); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
+        
+        body { 
+            background: #000; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+        /* HABER BANDI (Dinamik) */
+        .news-ticker { background: #1a0000; color: var(--fire); padding: 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #300; white-space: nowrap; overflow: hidden; }
+        .news-ticker span { display: inline-block; animation: ticker 20s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-<style>
-/* --- ORİJİNAL CSS AYNEN KORUNDU --- */
-:root {
---gold:#ffcf25;--bg:#050505;--fire:#ff4500;--green:#00ff88;
---blue:#00d9ff;--boss:#cc00ff;--glass:rgba(255,255,255,.05)
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Montserrat',sans-serif;user-select:none}
-body{
-background:radial-gradient(circle at center,#111 0%,#000 100%);
-color:white;height:100vh;display:flex;flex-direction:column;overflow:hidden
-}
-.header{text-align:center;padding:20px 10px;background:rgba(0,0,0,.4);
-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,207,37,.2)}
-#balance{font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;color:var(--gold)}
-.progress-bar{height:8px;background:#111;border-radius:10px;overflow:hidden;margin:8px auto;width:85%}
-#level-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--fire));width:0%;transition:.8s}
-.btn-act{
-background:linear-gradient(135deg,var(--gold),#f39c12);
-border:none;padding:12px;border-radius:12px;font-weight:900;
-font-family:'Orbitron';cursor:pointer;color:black;width:100%;
-}
-</style>
+        /* HEADER */
+        .header { text-align: center; padding: 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--gold); }
+        #balance { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: var(--gold); }
+        
+        /* SKINS */
+        .skin-neon { filter: drop-shadow(0 0 20px var(--blue)) hue-rotate(180deg) !important; }
+        .skin-gold { filter: drop-shadow(0 0 25px var(--gold)) !important; }
+        .skin-fire { filter: drop-shadow(0 0 20px var(--fire)) saturate(2) !important; }
+
+        /* MAIN */
+        #main-coin { 
+            width: 210px; cursor: pointer; transition: transform 0.05s; margin: 20px 0;
+            filter: drop-shadow(0 0 15px rgba(255,207,37,0.2));
+        }
+        #main-coin:active { transform: scale(0.9); }
+
+        /* SCREENS */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
+        .active-screen { display: flex; }
+
+        /* MARKET CARDS */
+        .card { background: var(--glass); border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; padding: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .price-up { color: var(--green); font-size: 10px; }
+        .price-down { color: var(--fire); font-size: 10px; }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; display: flex; padding: 10px 0; border-top: 1px solid #222; }
+        .nav-item { flex: 1; text-align: center; color: #444; font-size: 10px; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { display: block; font-size: 20px; margin-bottom: 3px; }
+
+        .btn-buy { background: var(--gold); color: black; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; }
+    </style>
 </head>
-
 <body>
 
-<div class="header">
-<span style="font-size:10px;color:#555">TOTAL ASSETS</span>
-<div id="balance">0</div>
-<div class="progress-bar"><div id="level-fill"></div></div>
-<div style="display:flex;justify-content:space-between;width:85%;margin:auto;font-size:10px">
-<span id="lv-text">LEVEL 1</span>
-<span id="passive-text">0.0/s</span>
-</div>
-</div>
+    <div class="news-ticker"><span id="news-text">PİYASA DURUMU: ESSE COIN %5 DEĞER KAZANDI! | YENİ GÜNCELLEME YOLDA...</span></div>
 
-<div style="flex:1;display:flex;justify-content:center;align-items:center">
-<img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png"
-style="width:220px" onclick="clickCoin(event)">
-</div>
+    <div class="header">
+        <div id="user-rank" style="font-size:10px; color:var(--blue)">GALAKTİK MADENCİ</div>
+        <div id="balance">0</div>
+        <div style="font-size:10px; color:#555; margin-top:5px;">PASİF: <span id="passive-text">0</span>/s | TIK: <span id="click-text">1</span></div>
+    </div>
 
-<script>
-/* ===============================
-   ORİJİNAL GLOBAL STATE
-================================ */
-let b = parseFloat(localStorage.getItem('b')) || 0;
-let e = parseInt(localStorage.getItem('e')) || 500;
-let lv = parseInt(localStorage.getItem('lv')) || 1;
-let a = parseFloat(localStorage.getItem('a')) || 0;
-let turbo=false;
+    <div id="game-s" class="screen active-screen">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" onclick="clickCoin(event)" ontouchstart="clickCoin(event)">
+            <div id="en-bar-wrap" style="width:200px;">
+                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:3px;">
+                    <span>ENERJİ</span>
+                    <span id="en-text">1000/1000</span>
+                </div>
+                <div style="height:6px; background:#111; border-radius:5px; overflow:hidden;">
+                    <div id="en-fill" style="width:100%; height:100%; background:var(--gold); transition:0.2s;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-/* ===============================
-   🔥 EK SİSTEMLER (UI YOK)
-================================ */
-let prestige = parseInt(localStorage.getItem('prestige')) || 0;
-let critChance = parseFloat(localStorage.getItem('critChance')) || 0.05;
-let todayEvent = localStorage.getItem('todayEvent') || "NONE";
-let lastDay = localStorage.getItem('lastDay') || "";
+    <div id="market-s" class="screen">
+        <h3 style="color:var(--blue); margin-bottom:15px; font-family:'Orbitron'">KRİPTO BORSA</h3>
+        <div class="card">
+            <div style="flex:1">
+                <b>ESSE Miner Pro</b><br>
+                <small id="m1-trend" class="price-up">▲ %12.4</small>
+            </div>
+            <div style="text-align:right; margin-right:15px;">
+                <span style="font-size:12px; color:var(--gold)" id="p-miner">5,000</span><br>
+                <small style="font-size:8px;">+5/s Gelir</small>
+            </div>
+            <button class="btn-buy" onclick="buyAsset('miner', 5000, 5)">SATIN AL</button>
+        </div>
 
-/* DAILY RESET + EVENT */
-(function(){
-const today=new Date().toDateString();
-if(lastDay!==today){
-lastDay=today;
-localStorage.setItem('lastDay',today);
-const ev=["NONE","CRIT","PASSIVE","TURBO"];
-todayEvent=ev[Math.floor(Math.random()*ev.length)];
-localStorage.setItem('todayEvent',todayEvent);
-localStorage.setItem('dailyClicks',0);
-}})();
+        <h3 style="color:var(--gold); margin:20px 0 15px; font-family:'Orbitron'">GÖRÜNÜM MAĞAZASI</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; width:100%;">
+            <div class="card" style="flex-direction:column; text-align:center;" onclick="applySkin('skin-neon', 10000)">
+                <div style="width:40px; height:40px; background:var(--blue); border-radius:50%; margin-bottom:10px; box-shadow:0 0 10px var(--blue)"></div>
+                <b>NEON</b><br><small>10k ESSE</small>
+            </div>
+            <div class="card" style="flex-direction:column; text-align:center;" onclick="applySkin('skin-fire', 25000)">
+                <div style="width:40px; height:40px; background:var(--fire); border-radius:50%; margin-bottom:10px; box-shadow:0 0 10px var(--fire)"></div>
+                <b>ATEŞ</b><br><small>25k ESSE</small>
+            </div>
+        </div>
+    </div>
 
-/* ===============================
-   CLICK (CRIT ENTEGRE)
-================================ */
-function clickCoin(ev){
-if(e<3)return;
-let base=(Math.floor(lv/2)+1)*(turbo?5:1);
-let gain=(Math.random()<critChance?base*10:base);
-b+=gain;
-e-=3;
-up();
-}
+    <nav class="nav">
+        <div class="nav-item active" onclick="sh(this,'game-s')"><i>🌕</i>MADEN</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><i>📈</i>BORSA</div>
+    </nav>
 
-/* ===============================
-   PRESTIGE (UI YOK)
-================================ */
-function prestigeNow(){
-if(lv<20)return alert("Prestige için Level 20");
-prestige++;
-critChance+=0.02;
-b=0;lv=1;a=0;e=500;
-localStorage.setItem('prestige',prestige);
-localStorage.setItem('critChance',critChance);
-alert("PRESTIGE! Kalıcı Crit +");
-}
+    <script>
+        let b = parseFloat(localStorage.getItem('b')) || 0;
+        let e = 1000;
+        let a = parseFloat(localStorage.getItem('a')) || 0;
+        let cp = parseInt(localStorage.getItem('cp')) || 1;
+        let activeSkin = localStorage.getItem('activeSkin') || "";
 
-/* ===============================
-   UPDATE
-================================ */
-function up(){
-let need=5000*Math.pow(lv,3);
-if(b>=need){lv++;}
+        const news = [
+            "PİYASA: Esse Miner fiyatları %20 arttı!",
+            "HABER: Yeni Galaksi keşfedildi, madencilik hızlanıyor!",
+            "FLAŞ: Elon Esse bir tweet attı, coinler uçuşta!",
+            "KRİTİK: Sistem hatası! Enerji dolum hızı yavaşladı."
+        ];
 
-document.getElementById('balance').innerText=Math.floor(b).toLocaleString();
-document.getElementById('level-fill').style.width=Math.min((b/need)*100,100)+"%";
-document.getElementById('lv-text').innerText="LEVEL "+lv;
-document.getElementById('passive-text').innerText=a.toFixed(1)+"/s";
+        window.onload = () => {
+            if(activeSkin) document.getElementById('main-coin').className = activeSkin;
+            updateUI();
+            startNews();
+        };
 
-localStorage.setItem('b',b);
-localStorage.setItem('lv',lv);
-localStorage.setItem('e',e);
-localStorage.setItem('a',a);
-}
+        function clickCoin(ev) {
+            if(ev.type === "touchstart") ev.preventDefault();
+            if(e >= 5) {
+                b += cp; e -= 5;
+                if(window.Telegram && Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                }
+                showPop(ev);
+                updateUI();
+            }
+        }
 
-/* ===============================
-   PASSIVE + EVENT BONUS
-================================ */
-setInterval(()=>{
-let mult=1;
-if(todayEvent==="PASSIVE")mult=1.5;
-b+=(a/10)*mult;
-if(e<500)e++;
-up();
-},100);
+        function showPop(ev) {
+            const x = ev.pageX || ev.touches[0].pageX;
+            const y = ev.pageY || ev.touches[0].pageY;
+            const p = document.createElement('div');
+            p.innerText = "+" + cp;
+            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:bold; pointer-events:none; animation: pop 0.6s forwards;`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 600);
+        }
 
-up();
-</script>
+        function buyAsset(type, cost, income) {
+            if(b >= cost) {
+                b -= cost; a += income;
+                updateUI();
+            }
+        }
 
+        function applySkin(skin, price) {
+            if(activeSkin === skin) return alert("Zaten aktif!");
+            if(b >= price) {
+                b -= price;
+                activeSkin = skin;
+                document.getElementById('main-coin').className = skin;
+                localStorage.setItem('activeSkin', skin);
+                updateUI();
+            } else {
+                alert("Yetersiz bakiye!");
+            }
+        }
+
+        function startNews() {
+            setInterval(() => {
+                const rand = news[Math.floor(Math.random()*news.length)];
+                document.getElementById('news-text').innerText = rand;
+            }, 10000);
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
+            document.getElementById('passive-text').innerText = a.toFixed(1);
+            document.getElementById('en-text').innerText = e + "/1000";
+            document.getElementById('en-fill').style.width = (e/10) + "%";
+            localStorage.setItem('b', b);
+            localStorage.setItem('a', a);
+        }
+
+        function sh(el, id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active-screen');
+            el.classList.add('active');
+        }
+
+        setInterval(() => {
+            b += a/10;
+            if(e < 1000) e += 2;
+            updateUI();
+        }, 100);
+
+    </script>
+    <style>
+        @keyframes pop { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
+    </style>
 </body>
 </html>
