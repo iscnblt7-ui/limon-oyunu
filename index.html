@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: The Complete Edition</title>
+    <title>ESSE STUDIO: Pro Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
@@ -11,7 +11,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
         body { background: #000; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- 1. GİRİŞ VE KAYIT PANELİ --- */
+        /* --- GİRİŞ PANELİ --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #151515 0%, #000 100%);
@@ -29,36 +29,47 @@
             color: var(--gold); font-family: 'Orbitron'; text-align: center; margin: 10px 0; font-size: 14px; outline: none;
         }
 
-        /* --- 2. OYUN ÜST PANEL --- */
+        /* --- SAĞ YAN PANEL (CÜZDAN & GÖREV) --- */
+        #side-panel {
+            position: fixed; right: -300px; top: 0; width: 280px; height: 100%;
+            background: rgba(10, 10, 10, 0.98); border-left: 2px solid var(--gold);
+            z-index: 9000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+        #side-panel.open { right: 0; }
+        .side-toggle {
+            position: absolute; left: -50px; top: 20%; width: 50px; height: 100px;
+            background: var(--gold); color: black; display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-rl; font-weight: 900; font-family: 'Orbitron'; font-size: 12px;
+            border-radius: 15px 0 0 15px; cursor: pointer;
+        }
+
+        /* --- OYUN ÜST PANEL --- */
         .header { text-align: center; padding: 15px; background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--gold); display: none; z-index: 500; }
         #balance { font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,207,37,0.3); }
         .progress-bar { height: 8px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 8px auto; width: 85%; }
         #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--fire)); width: 0%; transition: 0.4s; }
 
-        /* --- 3. EKRANLAR VE İÇERİK --- */
+        /* --- EKRANLAR --- */
         .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .active-screen { display: flex; animation: fadeIn 0.3s ease; }
+        .active-screen { display: flex; }
         
-        #main-coin { width: 240px; cursor: pointer; transition: transform 0.05s; margin: 25px 0; z-index: 10; }
+        #main-coin { width: 240px; cursor: pointer; transition: transform 0.05s; margin: 25px 0; }
         #main-coin:active { transform: scale(0.92); }
         .skin-neon { filter: drop-shadow(0 0 25px var(--blue)) hue-rotate(180deg) !important; }
         .skin-fire { filter: drop-shadow(0 0 25px var(--fire)) saturate(2) !important; }
 
-        /* KARTLAR VE BUTONLAR */
-        .card { background: var(--glass); padding: 18px; border-radius: 20px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-act { background: var(--gold); color: black; border: none; padding: 12px 18px; border-radius: 10px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; }
+        .card { background: var(--glass); padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-act { background: var(--gold); color: black; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
 
-        /* ALT MENÜ */
         .nav { position: fixed; bottom: 0; width: 100%; background: #080808; display: none; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; color: #444; font-size: 9px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
         .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
 
-        /* BOSS & CASINO */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
-        .slot-box { width: 70px; height: 90px; background: #000; border: 2px solid var(--gold); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 5px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9500; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .slot-box { width: 65px; height: 85px; background: #000; border: 2px solid var(--gold); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 5px; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pop { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-120px); } }
     </style>
 </head>
@@ -70,28 +81,44 @@
             <button id="tab-register" class="tab-btn" onclick="switchTab('register')">KAYIT OL</button>
         </div>
         <div class="login-box">
-            <h2 id="auth-title" style="font-family:'Orbitron'; font-size:18px; color:var(--gold); margin-bottom:15px;">ESSE STUDIO</h2>
+            <h2 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:15px;">ESSE STUDIO</h2>
             <input type="text" id="username-input" class="login-input" placeholder="Kullanıcı Adı">
             <input type="password" id="password-input" class="login-input" placeholder="Şifre">
-            <button id="auth-submit" class="btn-act" style="width:100%; margin-top:10px; font-size:14px; padding:18px;" onclick="handleAuth()">BAĞLAN</button>
+            <button class="btn-act" style="width:100%; margin-top:10px; font-size:14px; padding:18px;" onclick="handleAuth()">SİSTEME BAĞLAN</button>
             <p id="auth-status" style="font-size:10px; margin-top:15px; color:var(--blue);"></p>
         </div>
     </div>
 
+    <div id="side-panel">
+        <div class="side-toggle" onclick="document.getElementById('side-panel').classList.toggle('open')">MENU & CÜZDAN</div>
+        <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px; font-size:14px;">HIZLI ERİŞİM</h3>
+        
+        <div class="card" style="border-color:var(--blue); background:rgba(0,217,255,0.1);">
+            <div style="flex:1; font-size:11px;"><b>TON Wallet</b><br><small>Bağla & Çek</small></div>
+            <button class="btn-act" style="background:var(--blue); color:white;" onclick="alert('Yakında!')">BAĞLA</button>
+        </div>
+
+        <div style="margin: 20px 0; height: 1px; background: #333;"></div>
+
+        <h4 style="font-family:'Orbitron'; font-size:11px; color:var(--blue); margin-bottom:10px;">GÜNLÜK GÖREVLER</h4>
+        <div id="quest-list-side"></div>
+        
+        <button class="btn-act" style="width:100%; margin-top:15px; background:var(--boss); color:white;" onclick="inviteFriend()">ARKADAŞ DAVET ET</button>
+    </div>
+
     <div id="boss-ui" class="modal">
         <h1 style="color:var(--fire); font-family:'Orbitron';">BOSS RAID!</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="200" onclick="hitBoss()" style="filter:drop-shadow(0 0 30px red); margin:40px; cursor:pointer;">
-        <div class="progress-bar" style="width:70%; border-color:red;"><div id="boss-hp" style="width:100%; background:red; height:100%;"></div></div>
-        <p id="boss-timer" style="font-family:'Orbitron'; margin-top:10px;">30s</p>
+        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="180" onclick="hitBoss()" style="filter:drop-shadow(0 0 30px red); margin:30px;">
+        <div class="progress-bar" style="width:70%;"><div id="boss-hp" style="width:100%; background:red; height:100%;"></div></div>
     </div>
 
     <div class="header" id="main-header">
-        <div style="font-family:'Orbitron'; font-size:10px; color:var(--blue); margin-bottom:5px;">PİLOT: <span id="display-name">---</span></div>
+        <div style="font-family:'Orbitron'; font-size:9px; color:var(--blue); margin-bottom:4px;">PILOT: <span id="display-name">---</span></div>
         <div id="balance">0</div>
         <div class="progress-bar"><div id="level-fill"></div></div>
-        <div style="display:flex; justify-content:space-between; width:85%; margin:auto; font-size:10px; color:#555;">
-            <span>LEVEL <span id="lv-val" style="color:white">1</span></span>
-            <span>PASİF: <span id="passive-val" style="color:var(--green)">0</span>/s</span>
+        <div style="display:flex; justify-content:space-between; width:85%; margin:auto; font-size:9px; color:#555;">
+            <span>LVL <span id="lv-val" style="color:white">1</span></span>
+            <span>PASSIVE: <span id="passive-val" style="color:var(--green)">0</span>/s</span>
         </div>
     </div>
 
@@ -99,55 +126,46 @@
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
             <div id="combo-text" style="font-family:'Orbitron'; color:var(--blue); font-size:24px; opacity:0; font-weight:900;">X1.0</div>
             <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" onpointerdown="handleTouch(event)">
+            
             <div style="width:200px; margin-top:20px;">
-                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;"><span>ENERJİ</span><span id="en-text">500/500</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:5px;"><span>ENERGY</span><span id="en-text">500/500</span></div>
                 <div class="progress-bar" style="width:100%; margin:0; height:6px;"><div id="en-fill" style="width:100%; background:var(--gold); height:100%;"></div></div>
             </div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--blue); margin-bottom:20px;">MARKET & CÜZDAN</h3>
-        <div class="card" style="border-color:var(--blue); background:rgba(0,217,255,0.05);">
-            <div style="flex:1"><b>TON Cüzdan</b><br><small>Hemen Bağlan</small></div>
-            <button class="btn-act" style="background:var(--blue); color:white;" onclick="alert('Yakında!')">BAĞLA</button>
+        <h3 style="font-family:'Orbitron'; color:var(--blue); margin-bottom:20px;">UPGRADES</h3>
+        <div class="card">
+            <div style="flex:1"><b>GPU Miner V2</b><br><small>+10/s Passive</small></div>
+            <button class="btn-act" onclick="buyAsset(10000, 10)">10k BUY</button>
         </div>
         <div class="card">
-            <div style="flex:1"><b>GPU Miner V2</b><br><small>+10/s Pasif Gelir</small></div>
-            <button class="btn-act" onclick="buyAsset(10000, 10)">10k AL</button>
+            <div style="flex:1"><b>Neon Skin</b><br><small>Blue Glow</small></div>
+            <button class="btn-act" onclick="buySkin('skin-neon', 15000)">15k BUY</button>
         </div>
         <div class="card">
-            <div style="flex:1"><b>Neon Skin</b><br><small>Mavi Görünüm</small></div>
-            <button class="btn-act" onclick="buySkin('skin-neon', 15000)">15k AL</button>
+            <div style="flex:1"><b>Fire Skin</b><br><small>Fire Glow</small></div>
+            <button class="btn-act" onclick="buySkin('skin-fire', 30000)">30k BUY</button>
         </div>
-    </div>
-
-    <div id="task-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--boss); margin-bottom:20px;">GÖREVLER</h3>
-        <div class="card">
-            <div style="flex:1"><b>Davet Et</b><br><small>50k ESSE Kazandırır</small></div>
-            <button class="btn-act" onclick="inviteFriend()">DAVET</button>
-        </div>
-        <div id="quest-list" style="width:100%;"></div>
     </div>
 
     <div id="casino-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--fire); margin-bottom:20px;">ŞANS</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--fire); margin-bottom:20px;">LUCK CENTER</h3>
         <div style="display:flex; margin-bottom:20px;">
-            <div class="slot-box" id="s1">❓</div><div class="slot-box" id="s2">❓</div><div class="slot-box" id="s3">❓</div>
+            <div class="slot-box" id="s1">💎</div><div class="slot-box" id="s2">💎</div><div class="slot-box" id="s3">💎</div>
         </div>
-        <button class="btn-act" onclick="playSlot()" style="width:200px;">SLOT (5k)</button>
+        <button class="btn-act" onclick="playSlot()" style="width:200px;">SPIN SLOT (5k)</button>
         <div style="margin-top:40px; text-align:center;">
             <canvas id="wheel" width="180" height="180" style="border-radius:50%; border:5px solid #222;"></canvas><br>
-            <button class="btn-act" onclick="spinWheel()" style="margin-top:15px;">ÇARK (2k)</button>
+            <button class="btn-act" onclick="spinWheel()" style="margin-top:15px;">WHEEL (2k)</button>
         </div>
     </div>
 
     <nav class="nav" id="main-nav">
-        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💎</span>MADEN</div>
-        <div class="nav-item" onclick="sh(this,'market-s')"><span>📈</span>BORSA</div>
-        <div class="nav-item" onclick="sh(this,'task-s')"><span>📋</span>GÖREV</div>
-        <div class="nav-item" onclick="sh(this,'casino-s')"><span>🎰</span>ŞANS</div>
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💎</span>MINE</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>📈</span>MARKET</div>
+        <div class="nav-item" onclick="sh(this,'casino-s')"><span>🎰</span>LUCK</div>
     </nav>
 
     <script>
@@ -164,28 +182,23 @@
             mode = t;
             document.getElementById('tab-login').classList.toggle('active', t === 'login');
             document.getElementById('tab-register').classList.toggle('active', t === 'register');
-            document.getElementById('auth-submit').innerText = t === 'login' ? 'GİRİŞ YAP' : 'KAYIT OL';
         }
 
         async function handleAuth() {
             const u = document.getElementById('username-input').value.trim().toLowerCase();
             const p = document.getElementById('password-input').value.trim();
             const st = document.getElementById('auth-status');
-
-            if(u.length < 3 || p.length < 4) return alert("Hatalı giriş!");
-
+            if(u.length < 3 || p.length < 4) return alert("Geçersiz giriş!");
             st.innerText = "Yükleniyor...";
 
             try {
                 const res = await fetch(`${DATABASE_URL}users/${u}.json`);
                 const data = await res.json();
-
                 if(mode === 'login') {
-                    if(data && data.password === p) {
-                        startApp(u, data);
-                    } else { st.innerText = "Hatalı şifre veya kullanıcı!"; }
+                    if(data && data.password === p) startApp(u, data);
+                    else st.innerText = "Hatalı şifre/kullanıcı!";
                 } else {
-                    if(data) { st.innerText = "Bu isim zaten var!"; }
+                    if(data) st.innerText = "Bu isim alınmış!";
                     else {
                         const newUser = { password: p, b:0, a:0, lv:1, e:500, skin:"", quests:[] };
                         await fetch(`${DATABASE_URL}users/${u}.json`, { method: 'PUT', body: JSON.stringify(newUser) });
@@ -199,16 +212,13 @@
             currentUser = u;
             b = data.b || 0; a = data.a || 0; lv = data.lv || 1;
             e = data.e || 500; skin = data.skin || ""; quests = data.quests || [];
-            
             document.getElementById('login-screen').style.display = "none";
             document.getElementById('main-header').style.display = "block";
             document.getElementById('main-nav').style.display = "flex";
             document.getElementById('game-s').classList.add('active-screen');
             document.getElementById('display-name').innerText = currentUser.toUpperCase();
-            
             if(skin) document.getElementById('main-coin').className = skin;
             initWheel(); renderQuests(); updateUI();
-            
             setInterval(gameLoop, 100);
             setInterval(saveToCloud, 15000);
         }
@@ -228,7 +238,7 @@
                 let gain = lv * combo;
                 b += gain;
                 combo = Math.min(combo + 0.05, 5.0);
-                createPop(ev.pageX || ev.touches[0].pageX, ev.pageY || ev.touches[0].pageY, "+" + Math.floor(gain));
+                createPop(ev.pageX || (ev.touches ? ev.touches[0].pageX : 0), ev.pageY || (ev.touches ? ev.touches[0].pageY : 0), "+" + Math.floor(gain));
                 tg.HapticFeedback.impactOccurred('light');
                 updateUI();
             }
@@ -255,7 +265,7 @@
             const s = ['💎', '💰', '🔥', '🚀'];
             let r = [s[Math.floor(Math.random()*4)], s[Math.floor(Math.random()*4)], s[Math.floor(Math.random()*4)]];
             document.getElementById('s1').innerText = r[0]; document.getElementById('s2').innerText = r[1]; document.getElementById('s3').innerText = r[2];
-            if(r[0]==r[1] && r[1]==r[2]) { b += 100000; alert("TEBRİKLER!"); }
+            if(r[0]==r[1] && r[1]==r[2]) { b += 100000; alert("JACKPOT!"); }
             updateUI();
         }
 
@@ -270,7 +280,7 @@
             if(b < 2000) return; b -= 2000;
             document.getElementById('wheel').style.transition = "4s cubic-bezier(0.1,0,0.1,1)";
             document.getElementById('wheel').style.transform = `rotate(${2000 + Math.random()*360}deg)`;
-            setTimeout(() => { b += 10000; updateUI(); saveToCloud(); }, 4000);
+            setTimeout(() => { b += 12000; updateUI(); saveToCloud(); }, 4000);
         }
 
         function hitBoss() {
@@ -281,17 +291,17 @@
         }
 
         function renderQuests() {
-            const qs = [{id:1, t:"Başlangıç Hediyesi", r:2000}];
+            const qs = [{id:1, t:"Daily Bonus", r:5000}, {id:2, t:"Follow Social", r:10000}];
             let h = "";
             qs.forEach(q => {
                 const done = quests.includes(q.id);
-                h += `<div class="card"><div style="flex:1"><b>${q.t}</b><br><small>+${q.r} ESSE</small></div>
+                h += `<div class="card" style="padding:10px;"><div style="flex:1; font-size:10px;"><b>${q.t}</b><br>+${q.r}</div>
                 <button class="btn-act" onclick="claimQ(${q.id},${q.r})" ${done?'disabled':''}>${done?'OK':'AL'}</button></div>`;
             });
-            document.getElementById('quest-list').innerHTML = h;
+            document.getElementById('quest-list-side').innerHTML = h;
         }
         function claimQ(id, r) { if(!quests.includes(id)) { quests.push(id); b += r; renderQuests(); updateUI(); saveToCloud(); } }
-        function inviteFriend() { window.open(`https://t.me/share/url?url=https://t.me/EsseStudioBot&text=Gel beraber kazanalım!`); }
+        function inviteFriend() { window.open(`https://t.me/share/url?url=https://t.me/EsseStudioBot&text=Come and mine!`); }
 
         function createPop(x, y, txt) {
             let p = document.createElement('div'); p.innerText = txt;
