@@ -1,216 +1,139 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ESSE STUDIO v2</title>
-
+<title>ESSE STUDIO: Ultra Neon</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+
 <style>
-body{0;background:#000;color:#fff;font-family:Arial}
-button{cursor:pointer}
-.hidden{display:none}
-.badge{background:gold;color:black;padding:2px 6px;border-radius:6px;font-size:10px}
+/* --- ORİJİNAL CSS AYNEN KORUNDU --- */
+:root {
+--gold:#ffcf25;--bg:#050505;--fire:#ff4500;--green:#00ff88;
+--blue:#00d9ff;--boss:#cc00ff;--glass:rgba(255,255,255,.05)
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Montserrat',sans-serif;user-select:none}
+body{
+background:radial-gradient(circle at center,#111 0%,#000 100%);
+color:white;height:100vh;display:flex;flex-direction:column;overflow:hidden
+}
+.header{text-align:center;padding:20px 10px;background:rgba(0,0,0,.4);
+backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,207,37,.2)}
+#balance{font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;color:var(--gold)}
+.progress-bar{height:8px;background:#111;border-radius:10px;overflow:hidden;margin:8px auto;width:85%}
+#level-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--fire));width:0%;transition:.8s}
+.btn-act{
+background:linear-gradient(135deg,var(--gold),#f39c12);
+border:none;padding:12px;border-radius:12px;font-weight:900;
+font-family:'Orbitron';cursor:pointer;color:black;width:100%;
+}
 </style>
 </head>
+
 <body>
 
-<h2 align="center">💎 ESSE STUDIO – ULTRA NEON V2</h2>
-
-<div align="center">
-  <p>Balance: <b id="b">0</b></p>
-  <p>Level: <span id="lv">1</span> | Prestige: <span id="pr">0</span></p>
-  <p>Passive: <span id="ps">0</span>/s | Crit: <span id="crit">5%</span></p>
+<div class="header">
+<span style="font-size:10px;color:#555">TOTAL ASSETS</span>
+<div id="balance">0</div>
+<div class="progress-bar"><div id="level-fill"></div></div>
+<div style="display:flex;justify-content:space-between;width:85%;margin:auto;font-size:10px">
+<span id="lv-text">LEVEL 1</span>
+<span id="passive-text">0.0/s</span>
+</div>
 </div>
 
-<hr>
-
-<!-- CLICK -->
-<div align="center">
-  <button onclick="clickCoin()">CLICK</button>
+<div style="flex:1;display:flex;justify-content:center;align-items:center">
+<img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png"
+style="width:220px" onclick="clickCoin(event)">
 </div>
-
-<hr>
-
-<!-- TASKS -->
-<h3>📋 Daily Tasks</h3>
-<ul id="tasks"></ul>
-<button onclick="resetTasks()">Reset Tasks (Dev)</button>
-
-<hr>
-
-<!-- PRESTIGE -->
-<h3>🌟 Prestige</h3>
-<p>Reset everything, gain permanent +5% click power.</p>
-<button onclick="prestige()">PRESTIGE</button>
-
-<hr>
-
-<!-- SKINS -->
-<h3>🎨 Skins</h3>
-<button onclick="buySkin('gold')">Gold Skin</button>
-<button onclick="buySkin('neon')">Neon Skin</button>
-<p>Active Skin: <span id="skin">default</span></p>
-
-<hr>
-
-<!-- EVENTS -->
-<h3>🎉 Today Event</h3>
-<p id="event">No Event</p>
-
-<hr>
-
-<!-- LEADERBOARD -->
-<h3>🏆 Leaderboard (Local)</h3>
-<ol id="lb"></ol>
 
 <script>
-/* ======================
-   CORE STATE
-====================== */
-let state = JSON.parse(localStorage.getItem("esse_v2")) || {
-  balance:0,
-  level:1,
-  prestige:0,
-  passive:0,
-  crit:0.05,
-  skin:"default",
-  tasks:{
-    clicks:0,
-    slot:false,
-    upgrade:false
-  },
-  lastDay:new Date().toDateString()
-};
+/* ===============================
+   ORİJİNAL GLOBAL STATE
+================================ */
+let b = parseFloat(localStorage.getItem('b')) || 0;
+let e = parseInt(localStorage.getItem('e')) || 500;
+let lv = parseInt(localStorage.getItem('lv')) || 1;
+let a = parseFloat(localStorage.getItem('a')) || 0;
+let turbo=false;
 
-function save(){
-  localStorage.setItem("esse_v2",JSON.stringify(state));
+/* ===============================
+   🔥 EK SİSTEMLER (UI YOK)
+================================ */
+let prestige = parseInt(localStorage.getItem('prestige')) || 0;
+let critChance = parseFloat(localStorage.getItem('critChance')) || 0.05;
+let todayEvent = localStorage.getItem('todayEvent') || "NONE";
+let lastDay = localStorage.getItem('lastDay') || "";
+
+/* DAILY RESET + EVENT */
+(function(){
+const today=new Date().toDateString();
+if(lastDay!==today){
+lastDay=today;
+localStorage.setItem('lastDay',today);
+const ev=["NONE","CRIT","PASSIVE","TURBO"];
+todayEvent=ev[Math.floor(Math.random()*ev.length)];
+localStorage.setItem('todayEvent',todayEvent);
+localStorage.setItem('dailyClicks',0);
+}})();
+
+/* ===============================
+   CLICK (CRIT ENTEGRE)
+================================ */
+function clickCoin(ev){
+if(e<3)return;
+let base=(Math.floor(lv/2)+1)*(turbo?5:1);
+let gain=(Math.random()<critChance?base*10:base);
+b+=gain;
+e-=3;
+up();
 }
 
-function ui(){
-  b.innerText = Math.floor(state.balance);
-  lv.innerText = state.level;
-  pr.innerText = state.prestige;
-  ps.innerText = state.passive.toFixed(1);
-  crit.innerText = Math.round(state.crit*100)+"%";
-  skin.innerText = state.skin;
-  renderTasks();
-  renderLB();
+/* ===============================
+   PRESTIGE (UI YOK)
+================================ */
+function prestigeNow(){
+if(lv<20)return alert("Prestige için Level 20");
+prestige++;
+critChance+=0.02;
+b=0;lv=1;a=0;e=500;
+localStorage.setItem('prestige',prestige);
+localStorage.setItem('critChance',critChance);
+alert("PRESTIGE! Kalıcı Crit +");
 }
 
-ui();
+/* ===============================
+   UPDATE
+================================ */
+function up(){
+let need=5000*Math.pow(lv,3);
+if(b>=need){lv++;}
 
-/* ======================
-   CLICK & CRIT
-====================== */
-function clickCoin(){
-  let gain = 1 + state.prestige;
-  if(Math.random()<state.crit){
-    gain*=10;
-    alert("CRIT x10!");
-  }
-  state.balance+=gain;
-  state.tasks.clicks++;
-  levelCheck();
-  save();ui();
+document.getElementById('balance').innerText=Math.floor(b).toLocaleString();
+document.getElementById('level-fill').style.width=Math.min((b/need)*100,100)+"%";
+document.getElementById('lv-text').innerText="LEVEL "+lv;
+document.getElementById('passive-text').innerText=a.toFixed(1)+"/s";
+
+localStorage.setItem('b',b);
+localStorage.setItem('lv',lv);
+localStorage.setItem('e',e);
+localStorage.setItem('a',a);
 }
 
-/* ======================
-   LEVEL
-====================== */
-function levelCheck(){
-  let need = state.level*500;
-  if(state.balance>=need){
-    state.level++;
-    state.passive+=0.5;
-  }
-}
-
-/* ======================
-   TASKS
-====================== */
-function renderTasks(){
-  tasks.innerHTML="";
-  let t=[
-    ["100 Clicks",state.tasks.clicks>=100],
-    ["Play Slot",state.tasks.slot],
-    ["Buy Upgrade",state.tasks.upgrade]
-  ];
-  t.forEach(x=>{
-    let li=document.createElement("li");
-    li.innerHTML=x[0]+" "+(x[1]?"✅":"❌");
-    tasks.appendChild(li);
-  });
-}
-
-function resetTasks(){
-  state.tasks={clicks:0,slot:false,upgrade:false};
-  save();ui();
-}
-
-/* ======================
-   PRESTIGE
-====================== */
-function prestige(){
-  if(state.level<10) return alert("Need Level 10");
-  state.balance=0;
-  state.level=1;
-  state.passive=0;
-  state.prestige++;
-  state.crit+=0.02;
-  save();ui();
-}
-
-/* ======================
-   SKINS
-====================== */
-function buySkin(s){
-  if(state.balance<1000) return;
-  state.balance-=1000;
-  state.skin=s;
-  document.body.style.background = s==="gold"?"#332200":"#001122";
-  save();ui();
-}
-
-/* ======================
-   EVENT SYSTEM
-====================== */
-const events=["Turbo Day","+2 Passive","+50% Crit"];
-let todayEvent = events[new Date().getDate()%events.length];
-event.innerText=todayEvent;
-
-/* ======================
-   PASSIVE LOOP
-====================== */
+/* ===============================
+   PASSIVE + EVENT BONUS
+================================ */
 setInterval(()=>{
-  state.balance+=state.passive/10;
-  save();ui();
+let mult=1;
+if(todayEvent==="PASSIVE")mult=1.5;
+b+=(a/10)*mult;
+if(e<500)e++;
+up();
 },100);
 
-/* ======================
-   LEADERBOARD
-====================== */
-function renderLB(){
-  let lbData=JSON.parse(localStorage.getItem("lb")||"[]");
-  lbData.push({s:state.balance,t:Date.now()});
-  lbData=lbData.sort((a,b)=>b.s-a.s).slice(0,5);
-  localStorage.setItem("lb",JSON.stringify(lbData));
-  lb.innerHTML="";
-  lbData.forEach(x=>{
-    let li=document.createElement("li");
-    li.innerText=Math.floor(x.s);
-    lb.appendChild(li);
-  });
-}
-
-/* ======================
-   DAILY RESET
-====================== */
-if(state.lastDay!==new Date().toDateString()){
-  state.tasks={clicks:0,slot:false,upgrade:false};
-  state.lastDay=new Date().toDateString();
-}
+up();
 </script>
 
 </body>
