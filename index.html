@@ -3,109 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: Galactic Mine</title>
+    <title>ESSE STUDIO: Galactic Mine Official</title>
     
     <script src="https://adsgram.ai/js/adsgram-ad-sdk.js"></script>
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; --glass: rgba(255, 255, 255, 0.08); }
+        :root { 
+            --gold: #ffcf25; --bg: #050505; --fire: #ff4500; 
+            --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; 
+            --glass: rgba(255, 255, 255, 0.08); 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
         body { background: #000; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* GİRİŞ PANELİ */
+        /* GİRİŞ SİSTEMİ */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #151515 0%, #000 100%); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .auth-tabs { display: flex; width: 100%; max-width: 380px; margin-bottom: -2px; }
-        .tab-btn { flex:1; padding: 15px; background: rgba(255,255,255,0.05); border: 2px solid #333; color: #888; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; border-radius: 15px 15px 0 0; }
+        .tab-btn { flex:1; padding: 18px; background: rgba(255,255,255,0.05); border: 2px solid #333; color: #888; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; border-radius: 15px 15px 0 0; transition: 0.3s; }
         .tab-btn.active { background: #111; border-color: var(--gold); color: var(--gold); border-bottom: none; }
-        .login-box { background: #111; padding: 30px 20px; border-radius: 0 0 25px 25px; border: 2px solid var(--gold); text-align: center; width: 100%; max-width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .login-input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #444; background: #000; color: var(--gold); font-family: 'Orbitron'; text-align: center; margin: 10px 0; font-size: 14px; outline: none; }
+        .login-box { background: #111; padding: 35px 25px; border-radius: 0 0 25px 25px; border: 2px solid var(--gold); text-align: center; width: 100%; max-width: 380px; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
+        .login-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #444; background: #000; color: var(--gold); font-family: 'Orbitron'; text-align: center; margin: 12px 0; font-size: 14px; outline: none; }
 
         /* SAĞ YAN PANEL */
-        #side-panel { position: fixed; right: -300px; top: 0; width: 280px; height: 100%; background: rgba(5, 5, 5, 0.99); border-left: 2px solid var(--gold); z-index: 9000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; box-shadow: -15px 0 40px rgba(0,0,0,0.8); }
+        #side-panel { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: rgba(5, 5, 5, 0.98); border-left: 2px solid var(--gold); z-index: 9000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 25px; box-shadow: -15px 0 50px rgba(0,0,0,0.9); overflow-y: auto; }
         #side-panel.open { right: 0; }
-        .side-toggle { position: absolute; left: -45px; top: 150px; width: 45px; height: 120px; background: var(--gold); color: black; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; font-weight: 900; font-family: 'Orbitron'; font-size: 11px; border-radius: 12px 0 0 12px; cursor: pointer; }
+        .side-toggle { position: absolute; left: -45px; top: 140px; width: 45px; height: 130px; background: var(--gold); color: black; display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; font-weight: 900; font-family: 'Orbitron'; font-size: 12px; border-radius: 15px 0 0 15px; cursor: pointer; box-shadow: -5px 0 15px rgba(255,207,37,0.3); }
 
         /* ÜST PANEL */
-        .header { text-align: center; padding: 15px; background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--gold); display: none; z-index: 500; }
-        #balance { font-family: 'Orbitron', sans-serif; font-size: 42px; font-weight: 900; color: var(--gold); text-shadow: 0 0 25px rgba(255,207,37,0.4); }
+        .header { text-align: center; padding: 20px 15px; background: rgba(0,0,0,0.96); border-bottom: 2px solid var(--gold); display: none; z-index: 500; }
+        #balance { font-family: 'Orbitron'; font-size: 46px; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px rgba(255,207,37,0.5); letter-spacing: -1px; }
         
-        /* PARA GÖRSELİ */
-        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        /* OYUN ALANI */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; }
         .active-screen { display: flex; }
-        #main-coin { width: 280px; height: 280px; object-fit: contain; cursor: pointer; transition: transform 0.05s ease-out; filter: drop-shadow(0 0 35px rgba(255,207,37,0.45)); -webkit-tap-highlight-color: transparent; margin: 20px 0; }
-        #main-coin:active { transform: scale(0.92); }
+        #main-coin { width: 290px; height: 290px; object-fit: contain; cursor: pointer; transition: transform 0.05s ease-out; filter: drop-shadow(0 0 40px rgba(255,207,37,0.4)); -webkit-tap-highlight-color: transparent; }
+        #main-coin:active { transform: scale(0.9); }
 
-        /* KARTLAR VE BUTONLAR */
-        .card { background: var(--glass); padding: 15px; border-radius: 15px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .btn-act { background: var(--gold); color: black; border: none; padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 10px; }
-        
-        @keyframes pop { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-120px); } }
+        /* REKLAM VE KARTLAR */
+        .card { background: var(--glass); padding: 18px; border-radius: 18px; width: 100%; margin-bottom: 15px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
+        .card:hover { border-color: var(--gold); }
+        .btn-act { background: var(--gold); color: black; border: none; padding: 14px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; text-transform: uppercase; }
+
+        /* ENERJİ SİSTEMİ */
+        .en-container { width: 240px; margin-top: 30px; text-align: center; }
+        .en-bar { height: 10px; background: #111; border-radius: 20px; overflow: hidden; border: 1px solid #333; margin-top: 8px; box-shadow: inset 0 0 10px #000; }
+        #en-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #fff); width: 100%; transition: 0.3s; }
+
+        /* ALT NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #080808; display: none; padding: 20px 0; border-top: 1px solid #222; z-index: 1000; justify-content: space-around; }
+        .nav-item { text-align: center; color: #555; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item span { display: block; font-size: 26px; margin-bottom: 5px; }
+
+        @keyframes pop { 0% { opacity:1; transform:translateY(0) scale(1); } 100% { opacity:0; transform:translateY(-140px) scale(1.5); } }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="auth-tabs"><button id="tab-login" class="tab-btn active" onclick="switchTab('login')">GİRİŞ YAP</button><button id="tab-register" class="tab-btn" onclick="switchTab('register')">KAYIT OL</button></div>
+        <div class="auth-tabs">
+            <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">GİRİŞ YAP</button>
+            <button id="tab-register" class="tab-btn" onclick="switchTab('register')">KAYIT OL</button>
+        </div>
         <div class="login-box">
-            <h2 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:15px; font-size:22px;">ESSE STUDIO</h2>
+            <h2 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px; font-size:24px; letter-spacing:2px;">ESSE STUDIO</h2>
             <input type="text" id="username-input" class="login-input" placeholder="Kullanıcı Adı">
             <input type="password" id="password-input" class="login-input" placeholder="Şifre">
-            <button class="btn-act" style="width:100%; margin-top:10px; font-size:14px; padding:18px;" onclick="handleAuth()">BAĞLAN</button>
-            <p id="auth-status" style="font-size:10px; margin-top:15px; color:var(--blue);"></p>
+            <button class="btn-act" style="width:100%; margin-top:15px; font-size:15px; padding:20px;" onclick="handleAuth()">SİSTEME BAĞLAN</button>
+            <p id="auth-status" style="font-size:11px; margin-top:20px; color:var(--blue); font-weight:bold;"></p>
         </div>
     </div>
 
     <div id="side-panel">
-        <div class="side-toggle" onclick="document.getElementById('side-panel').classList.toggle('open')">MENU & CÜZDAN</div>
-        <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px; font-size:14px;">BONUS MERKEZİ</h3>
+        <div class="side-toggle" onclick="document.getElementById('side-panel').classList.toggle('open')">SİSTEM & BONUS</div>
         
-        <div class="card" style="border-color:var(--boss); background:rgba(204,0,255,0.1);">
-            <div style="flex:1; font-size:11px; color:white;">
-                <b>ÜCRETSİZ ÖDÜL</b><br>
-                <small>Video İzle & 100k ESSE Al</small>
+        <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:20px; font-size:15px; border-bottom:1px solid #333; padding-bottom:10px;">BONUS MERKEZİ</h3>
+        
+        <div class="card" style="border-color:var(--boss); background:rgba(204,0,255,0.12); flex-direction:column; align-items:stretch;">
+            <div style="font-size:12px; color:white; margin-bottom:12px; text-align:center;">
+                <b style="color:var(--boss); font-size:14px;">ÜCRETSİZ 100.000 ESSE</b><br>
+                <span style="opacity:0.7;">Kısa bir reklam videosu izle.</span>
             </div>
-            <button class="btn-act" style="background:var(--boss); color:white;" onclick="izleVeKazan()">İZLE</button>
+            <button class="btn-act" style="background:var(--boss); color:white;" onclick="izleVeKazan()">REKLAMI BAŞLAT</button>
         </div>
 
-        <div style="margin: 20px 0; height: 1px; background: #333;"></div>
-        <p style="font-size:10px; color:#555; text-align:center;">Pilot ID: <span id="pilot-id">---</span></p>
+        <h3 style="font-family:'Orbitron'; color:var(--blue); margin:25px 0 15px; font-size:15px;">GÖREVLER</h3>
+        <div id="quest-list">
+            <div class="card" style="font-size:11px;">
+                <div style="flex:1;"><b>Telegram Takip</b><br><small>+50,000 ESSE</small></div>
+                <button class="btn-act" style="padding:8px 12px;" onclick="window.open('https://t.me/essestudio')">GİT</button>
+            </div>
+        </div>
+
+        <div style="margin-top:40px; padding:15px; background:rgba(255,255,255,0.03); border-radius:12px; text-align:center;">
+            <div style="font-size:10px; color:#666;">OTURUM SAHİBİ</div>
+            <div id="pilot-id-display" style="font-family:'Orbitron'; color:var(--gold); font-size:13px;">---</div>
+        </div>
     </div>
 
     <div class="header" id="main-header">
         <div id="balance">0</div>
-        <div style="font-family:'Orbitron'; font-size:10px; color:var(--blue);">OPERATOR: <span id="display-name">---</span></div>
+        <div style="font-family:'Orbitron'; font-size:11px; color:var(--blue); margin-top:5px; font-weight:800;">PILOT: <span id="display-name">---</span></div>
     </div>
 
     <div id="game-s" class="screen active-screen" style="display:none;">
+        <div id="combo-text" style="font-family:'Orbitron'; color:var(--blue); font-size:28px; opacity:0; font-weight:900; position:absolute; top:20px;">X1.0</div>
+        
         <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" onpointerdown="handleTouch(event)">
-        <div style="width:220px; margin-top:20px;">
-            <div id="en-text" style="font-size:11px; text-align:center; margin-bottom:5px;">500/500</div>
-            <div style="height:8px; background:#111; border-radius:10px; overflow:hidden; border:1px solid #333;"><div id="en-fill" style="width:100%; background:var(--gold); height:100%;"></div></div>
+        
+        <div class="en-container">
+            <div style="font-size:12px; font-weight:800; letter-spacing:1px;">ENERGY: <span id="en-text">500/500</span></div>
+            <div class="en-bar"><div id="en-fill"></div></div>
         </div>
     </div>
+
+    <nav class="nav" id="main-nav">
+        <div class="nav-item active"><span>💎</span>MINE</div>
+        <div class="nav-item" onclick="alert('Yakında!')"><span>🚀</span>UPGRADE</div>
+        <div class="nav-item" onclick="alert('Yakında!')"><span>🏆</span>TOP</div>
+    </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
 
         const DATABASE_URL = "https://esseoyunu-default-rtdb.firebaseio.com/"; 
-        const ADS_BLOCK_ID = "29045"; // Senin Adsgram ID'n
+        const REKLAM_ID = "29045";
 
-        let currentUser = "", b = 0, a = 0, e = 500, mode = 'login';
+        let currentUser = "", b = 0, e = 500, mode = 'login';
 
-        function switchTab(t) { mode = t; document.getElementById('tab-login').classList.toggle('active', t==='login'); document.getElementById('tab-register').classList.toggle('active', t==='register'); }
+        function switchTab(t) {
+            mode = t;
+            document.getElementById('tab-login').classList.toggle('active', t==='login');
+            document.getElementById('tab-register').classList.toggle('active', t==='register');
+        }
 
         async function handleAuth() {
             const u = document.getElementById('username-input').value.trim().toLowerCase();
             const p = document.getElementById('password-input').value.trim();
-            if(u.length < 3) return;
-            const res = await fetch(`${DATABASE_URL}users/${u}.json`);
-            const data = await res.json();
-            if(mode === 'login') { if(data && data.password === p) startApp(u, data); else alert("Hatalı giriş!"); }
-            else { if(!data) { const newUser = {password:p, b:0, a:0, e:500}; await fetch(`${DATABASE_URL}users/${u}.json`, {method:'PUT', body:JSON.stringify(newUser)}); startApp(u, newUser); } else alert("Bu kullanıcı adı alınmış!"); }
+            const status = document.getElementById('auth-status');
+
+            if(u.length < 3 || p.length < 4) { alert("Geçersiz giriş!"); return; }
+            
+            status.innerText = "BAĞLANTI KURULUYOR...";
+            try {
+                const res = await fetch(`${DATABASE_URL}users/${u}.json`);
+                const data = await res.json();
+
+                if(mode === 'login') {
+                    if(data && data.password === p) startApp(u, data);
+                    else { status.innerText = "HATALI KULLANICI VEYA ŞİFRE!"; }
+                } else {
+                    if(!data) {
+                        const newUser = {password:p, b:0, e:500, created: Date.now()};
+                        await fetch(`${DATABASE_URL}users/${u}.json`, {method:'PUT', body:JSON.stringify(newUser)});
+                        startApp(u, newUser);
+                    } else { status.innerText = "BU KULLANICI ADI DOLU!"; }
+                }
+            } catch(hata) { status.innerText = "SUNUCU HATASI!"; }
         }
 
         function startApp(u, data) {
@@ -113,51 +171,65 @@
             document.getElementById('login-screen').style.display = "none";
             document.getElementById('main-header').style.display = "block";
             document.getElementById('game-s').style.display = "flex";
+            document.getElementById('main-nav').style.display = "flex";
             document.getElementById('display-name').innerText = currentUser.toUpperCase();
-            document.getElementById('pilot-id').innerText = u;
-            setInterval(() => { if(e < 500) e += 0.5; updateUI(); }, 1000);
-            setInterval(saveToCloud, 10000);
+            document.getElementById('pilot-id-display').innerText = "@" + currentUser;
+            
+            // Döngüler
+            setInterval(() => { if(e < 500) { e += 0.8; updateUI(); } }, 1000);
+            setInterval(saveToCloud, 15000);
             updateUI();
         }
 
         function handleTouch(ev) {
             ev.preventDefault();
-            if(e >= 2) { 
-                e -= 2; b += 1; 
-                const x = ev.pageX || (ev.touches ? ev.touches[0].pageX : 0);
-                const y = ev.pageY || (ev.touches ? ev.touches[0].pageY : 0);
-                createPop(x, y, "+1"); 
-                tg.HapticFeedback.impactOccurred('light'); 
-                updateUI(); 
+            if(e >= 2) {
+                e -= 2; b += 1;
+                const touch = ev.touches ? ev.touches[0] : ev;
+                createPop(touch.pageX, touch.pageY, "+1");
+                tg.HapticFeedback.impactOccurred('medium');
+                updateUI();
             }
         }
 
-        // --- REKLAM FONKSİYONU ---
+        // --- REKLAM SİSTEMİ ---
         function izleVeKazan() {
-            const AdController = window.Adsgram.init({ blockId: ADS_BLOCK_ID });
+            const AdController = window.Adsgram.init({ blockId: REKLAM_ID });
             AdController.show().then((result) => {
                 b += 100000;
-                alert("Başarılı! 100.000 ESSE eklendi.");
+                alert("TEBRİKLER! 100,000 ESSE HESABINA AKTARILDI.");
                 updateUI();
                 saveToCloud();
             }).catch((err) => {
-                alert("Ödül için reklamı bitirmelisin.");
+                alert("ÖDÜL İÇİN VİDEOYU SONUNA KADAR İZLEMELİSİN.");
             });
         }
 
         function updateUI() {
             document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
             document.getElementById('en-text').innerText = Math.floor(e) + "/500";
-            document.getElementById('en-fill').style.width = (e/5) + "%";
+            document.getElementById('en-fill').style.width = (e / 5) + "%";
         }
 
-        function saveToCloud() { if(currentUser) fetch(`${DATABASE_URL}users/${currentUser}.json`, {method:'PATCH', body:JSON.stringify({b, e})}); }
-        
-        function createPop(x, y, txt) { 
-            let p = document.createElement('div'); p.innerText = txt; 
-            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:bold; font-size:24px; animation: pop 0.8s forwards; pointer-events:none; z-index:9999;`; 
-            document.body.appendChild(p); setTimeout(()=>p.remove(), 800); 
+        function saveToCloud() {
+            if(currentUser) {
+                fetch(`${DATABASE_URL}users/${currentUser}.json`, {
+                    method:'PATCH', 
+                    body:JSON.stringify({b: b, e: e})
+                });
+            }
         }
+
+        function createPop(x, y, txt) {
+            let p = document.createElement('div');
+            p.innerText = txt;
+            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:900; font-family:'Orbitron'; font-size:28px; animation: pop 0.8s forwards; pointer-events:none; z-index:9999; text-shadow: 0 0 10px rgba(0,0,0,1);`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+        }
+
+        // Uygulama kapanırken son bir kez kaydet
+        window.addEventListener('beforeunload', saveToCloud);
     </script>
 </body>
 </html>
