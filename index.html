@@ -3,349 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: The Ultimate Ecosystem</title>
+    <title>ESSE STUDIO: Cloud Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; --glass: rgba(255, 255, 255, 0.05); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
-        
         body { background: radial-gradient(circle at center, #111 0%, #000 100%); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* HEADER & STATS */
-        .header { text-align: center; padding: 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); border-bottom: 2px solid var(--gold); z-index: 100; }
-        #balance { font-family: 'Orbitron', sans-serif; font-size: 34px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,207,37,0.4); }
-        
-        .progress-bar { height: 6px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 8px auto; width: 80%; }
+        /* PROFIL ALANI */
+        .header { text-align: center; padding: 10px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); z-index: 100; }
+        #user-info { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px; }
+        #user-img { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--gold); }
+        #user-name { font-size: 11px; font-weight: bold; color: #fff; }
+
+        #balance { font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 900; color: var(--gold); text-shadow: 0 0 15px rgba(255,207,37,0.4); }
+        .progress-bar { height: 6px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 5px auto; width: 80%; }
         #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--fire)); width: 0%; transition: 0.4s; }
 
-        /* SCREENS */
-        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .active-screen { display: flex; animation: fadeIn 0.3s ease; }
-
-        /* COIN & EFFECTS */
-        #coin-container { position: relative; margin: 30px 0; }
-        #main-coin { width: 220px; cursor: pointer; transition: transform 0.05s; will-change: transform; }
+        /* COIN */
+        #main-coin { width: 200px; cursor: pointer; transition: transform 0.05s; margin: 20px 0; }
         #main-coin:active { transform: scale(0.9); }
         .skin-neon { filter: drop-shadow(0 0 20px var(--blue)) hue-rotate(180deg); }
         .skin-fire { filter: drop-shadow(0 0 20px var(--fire)) saturate(2); }
-        .skin-gold { filter: drop-shadow(0 0 30px var(--gold)); }
 
-        /* CARDS */
-        .card { background: var(--glass); padding: 15px; border-radius: 18px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-act { background: var(--gold); color: black; border: none; padding: 10px 15px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 11px; font-family: 'Orbitron'; }
-        .btn-act:disabled { background: #333; color: #666; }
-
-        /* MODALS */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #111; border: 2px solid var(--gold); padding: 25px; border-radius: 25px; text-align: center; width: 100%; max-width: 320px; }
+        /* SCREENS & CARDS */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
+        .active-screen { display: flex; animation: fadeIn 0.3s ease; }
+        .card { background: var(--glass); padding: 12px; border-radius: 15px; width: 100%; margin-bottom: 8px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-act { background: var(--gold); color: black; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 10px; font-family: 'Orbitron'; }
 
         /* NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95); display: flex; padding: 12px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95); display: flex; padding: 10px 0; border-top: 1px solid #222; }
         .nav-item { flex: 1; text-align: center; color: #444; font-size: 9px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
-        .nav-item span { display: block; font-size: 22px; margin-bottom: 3px; }
+        .nav-item span { display: block; font-size: 20px; }
 
-        /* CASINO */
-        .slot-machine { display: flex; gap: 10px; margin: 20px 0; }
-        .slot-box { width: 60px; height: 80px; background: #000; border: 2px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
-        #wheel { transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
-
-        /* NEWS TICKER */
-        .ticker { background: #1a0000; color: var(--fire); font-size: 10px; padding: 4px; overflow: hidden; white-space: nowrap; border-bottom: 1px solid #300; }
-        .ticker span { display: inline-block; animation: ticker 15s linear infinite; }
-        @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+        @keyframes pop { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-80px); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="daily-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="font-family:'Orbitron'; color:var(--gold)">GÜNLÜK ÖDÜL</h2>
-            <p id="streak-text" style="margin:15px 0; color:#888;">1. Gün Girişi</p>
-            <div id="reward-val" style="font-size:32px; font-weight:900; margin-bottom:20px;">+5.000</div>
-            <button class="btn-act" onclick="claimDaily()">ÖDÜLÜ AL</button>
-        </div>
-    </div>
-
-    <div id="boss-ui" class="modal" style="flex-direction: column;">
-        <h1 style="color:var(--fire); font-family:'Orbitron'; margin-bottom:20px;">BOSS RAID!</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="180" onclick="hitBoss()" style="filter:drop-shadow(0 0 30px red);">
-        <div class="progress-bar" style="width:70%; border-color:red; margin-top:30px;"><div id="boss-hp" style="width:100%; background:red; height:100%;"></div></div>
-        <p id="boss-timer" style="font-family:'Orbitron'; margin-top:10px;">30s</p>
-    </div>
-
-    <div class="ticker"><span id="news-text">PİYASA ANALİZİ: ESSE COIN YÜKSELİŞE GEÇTİ! | YENİ GÖREVLER EKLENDİ...</span></div>
-
     <div class="header">
-        <div id="user-rank" style="font-size:9px; color:var(--blue); letter-spacing:2px; font-weight:bold;">BRONZ MADENCİ</div>
+        <div id="user-info">
+            <img id="user-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+            <span id="user-name">Giriş Yapılıyor...</span>
+        </div>
         <div id="balance">0</div>
         <div class="progress-bar"><div id="level-fill"></div></div>
-        <div style="display:flex; justify-content:space-between; width:80%; margin:auto; font-size:9px; color:#555;">
-            <span id="lv-text">LEVEL 1</span>
-            <span id="passive-text">0.0/s</span>
-        </div>
+        <div style="font-size:9px; color:#555; font-weight:bold;">LEVEL <span id="lv-val">1</span> | PASİF: <span id="passive-val">0</span>/s</div>
     </div>
 
     <div id="game-s" class="screen active-screen">
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <div id="combo-text" style="font-family:'Orbitron'; color:var(--blue); font-size:24px; opacity:0;">X1.0</div>
-            <div id="coin-container">
-                <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" ontouchstart="handleTouch(event)">
-            </div>
+            <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" ontouchstart="clickCoin(event)">
             <div style="width:180px;">
-                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:4px;">
-                    <span>ENERJİ</span>
-                    <span id="en-text">500/500</span>
-                </div>
+                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:3px;"><span>ENERJİ</span><span id="en-text">500/500</span></div>
                 <div class="progress-bar" style="width:100%; margin:0;"><div id="en-fill" style="width:100%; background:var(--gold); height:100%;"></div></div>
-                <button id="turbo-btn" class="btn-act" style="display:none; width:100%; margin-top:10px; background:var(--fire);" onclick="activateTurbo()">🔥 TURBOYU AÇ</button>
             </div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--green); margin-bottom:15px;">MADENCİLİK & SKINS</h3>
-        <div class="card">
-            <div style="flex:1"><b>GPU Miner</b><br><small>+5/s Gelir</small></div>
-            <div style="margin-right:15px; font-weight:bold; color:var(--gold)" id="p-miner">5,000</div>
-            <button class="btn-act" onclick="buyAsset('miner', 5000, 5)">AL</button>
+        <h3 style="font-family:'Orbitron'; color:var(--blue); margin-bottom:15px;">MARKET & BULUT</h3>
+        <div class="card" style="border-left:4px solid var(--green);">
+            <div style="flex:1"><b>Auto Bot</b><br><small>+2/s Gelir</small></div>
+            <button class="btn-act" onclick="buyAsset(1000, 2)">1,000 AL</button>
         </div>
-        <div class="card">
-            <div style="flex:1"><b>Neon Skin</b><br><small>Mavi Işıltı</small></div>
-            <div style="margin-right:15px; font-weight:bold; color:var(--blue)">15,000</div>
-            <button class="btn-act" onclick="buySkin('skin-neon', 15000)">AL</button>
+        <div class="card" style="border-left:4px solid var(--fire);">
+            <div style="flex:1"><b>Ateş Görünümü</b><br><small>Kırmızı Efekt</small></div>
+            <button class="btn-act" onclick="buySkin('skin-fire', 5000)">5,000 AL</button>
         </div>
-        <div class="card" style="background:rgba(0,217,255,0.1);">
-            <div style="flex:1"><b>TON Cüzdan</b><br><small>Bağlantı Kur</small></div>
-            <button class="btn-act" style="background:var(--blue)" onclick="connectWallet()">BAĞLA</button>
-        </div>
-    </div>
-
-    <div id="task-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--boss); margin-bottom:15px;">GÖREVLER & ARKADAŞLAR</h3>
-        <div class="card">
-            <div style="flex:1"><b>Arkadaşını Davet Et</b><br><small>Kişi başı 25k ESSE</small></div>
-            <button class="btn-act" onclick="inviteFriend()">DAVET ET</button>
-        </div>
-        <div id="quest-container" style="width:100%;">
-            </div>
-    </div>
-
-    <div id="casino-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--fire); margin-bottom:15px;">KASİNO</h3>
-        <div class="slot-machine">
-            <div class="slot-box" id="s1">💎</div>
-            <div class="slot-box" id="s2">💎</div>
-            <div class="slot-box" id="s3">💎</div>
-        </div>
-        <button class="btn-act" onclick="playSlot()" style="width:200px; margin-bottom:30px;">SLOT ÇEVİR (5k)</button>
-
-        <canvas id="wheel" width="200" height="200" style="border-radius:50%; border:5px solid #222;"></canvas>
-        <button class="btn-act" onclick="spinWheel()" style="width:200px; margin-top:15px;">ÇARKI DÖNDÜR (2k)</button>
+        <p style="font-size:9px; color:#555; margin-top:20px;">VERİLERİNİZ TELEGRAM ID İLE BULUTA BAĞLIDIR.</p>
     </div>
 
     <nav class="nav">
-        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💎</span>MADEN</div>
-        <div class="nav-item" onclick="sh(this,'market-s')"><span>📈</span>BORSA</div>
-        <div class="nav-item" onclick="sh(this,'task-s')"><span>👥</span>GÖREV</div>
-        <div class="nav-item" onclick="sh(this,'casino-s')"><span>🎰</span>ŞANS</div>
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>⛏️</span>OYUN</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>🚀</span>MARKET</div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // DEĞİŞKENLER (LOCALSTORAGE)
-        let b = parseFloat(localStorage.getItem('esse_b')) || 0;
-        let a = parseFloat(localStorage.getItem('esse_a')) || 0;
-        let lv = parseInt(localStorage.getItem('esse_lv')) || 1;
-        let e = parseInt(localStorage.getItem('esse_e')) || 500;
-        let clicks = parseInt(localStorage.getItem('esse_clicks')) || 0;
-        let skin = localStorage.getItem('esse_skin') || "";
-        let lastDaily = parseInt(localStorage.getItem('esse_daily')) || 0;
-        let quests = JSON.parse(localStorage.getItem('esse_quests')) || [];
+        // FIREBASE AYARI
+        const DATABASE_URL = "https://console.firebase.google.com/u/2/project/esseoyunu/database/esseoyunu-default-rtdb/data/~2F"; // Senin linkin
+        const user = tg.initDataUnsafe?.user;
+        const userId = user ? user.id : "guest";
 
-        let combo = 1.0;
-        let turbo = false;
-        let turboCharge = 0;
+        // OYUN DEĞİŞKENLERİ
+        let b = 0; let a = 0; let lv = 1; let e = 500; let skin = "";
 
-        window.onload = () => {
-            initWheel();
-            checkDaily();
-            renderQuests();
-            updateUI();
-            if(skin) document.getElementById('main-coin').classList.add(skin);
-        };
+        // GİRİŞ VE VERİ ÇEKME
+        async function initGame() {
+            if (user) {
+                document.getElementById('user-name').innerText = user.first_name;
+                if (user.photo_url) document.getElementById('user-img').src = user.photo_url;
+            } else {
+                document.getElementById('user-name').innerText = "Misafir Modu";
+            }
 
-        // UI GÜNCELLEME
-        function updateUI() {
-            document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
-            document.getElementById('passive-text').innerText = a.toFixed(1);
-            document.getElementById('lv-text').innerText = "LEVEL " + lv;
-            document.getElementById('en-text').innerText = Math.floor(e) + "/500";
-            document.getElementById('en-fill').style.width = (e/5) + "%";
-            
-            let nxt = 10000 * Math.pow(lv, 2.5);
-            document.getElementById('level-fill').style.width = Math.min((b/nxt)*100, 100) + "%";
-            if(b >= nxt) { lv++; tg.HapticFeedback.notificationOccurred('success'); }
-
-            localStorage.setItem('esse_b', b);
-            localStorage.setItem('esse_a', a);
-            localStorage.setItem('esse_lv', lv);
-            localStorage.setItem('esse_e', e);
-            localStorage.setItem('esse_clicks', clicks);
+            // Firebase'den verileri getir
+            try {
+                const res = await fetch(`${DATABASE_URL}users/${userId}.json`);
+                const data = await res.json();
+                if (data) {
+                    b = data.b || 0; a = data.a || 0;
+                    lv = data.lv || 1; skin = data.skin || "";
+                    if(skin) document.getElementById('main-coin').className = skin;
+                    updateUI();
+                }
+            } catch (e) { console.log("Veri çekilemedi, yeni hesap açılıyor."); }
         }
 
-        // TIKLAMA SİSTEMİ
-        function handleTouch(ev) {
+        // VERİ KAYDETME (BULUTA)
+        async function saveToCloud() {
+            if (userId === "guest") return;
+            const data = { b, a, lv, skin, lastUpdate: Date.now() };
+            try {
+                await fetch(`${DATABASE_URL}users/${userId}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            } catch (e) { console.error("Cloud Save Error"); }
+        }
+
+        function clickCoin(ev) {
             ev.preventDefault();
-            if(e >= 2) {
-                clicks++;
-                e -= 2;
-                let gain = (1 * lv * combo * (turbo ? 5 : 1));
-                b += gain;
-                
-                combo = Math.min(combo + 0.01, 3.0);
-                showCombo();
-                createPop(ev.touches[0].pageX, ev.touches[0].pageY, "+" + Math.floor(gain));
-                
-                if(!turbo) {
-                    turboCharge += 0.5;
-                    if(turboCharge >= 100) document.getElementById('turbo-btn').style.display = "block";
-                }
-                
+            if (e >= 2) {
+                b += (1 * lv); e -= 2;
+                createPop(ev.touches[0].pageX, ev.touches[0].pageY, "+" + lv);
                 tg.HapticFeedback.impactOccurred('light');
                 updateUI();
             }
         }
 
-        function showCombo() {
-            let el = document.getElementById('combo-text');
-            el.innerText = "X" + combo.toFixed(1);
-            el.style.opacity = combo > 1.1 ? 1 : 0;
-        }
-
-        function createPop(x, y, txt) {
-            let p = document.createElement('div');
-            p.innerText = txt;
-            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:bold; pointer-events:none; animation: pop 0.8s forwards; z-index:9999;`;
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
-        }
-
-        // MARKET & SKIN
-        function buyAsset(id, cost, income) {
-            if(b >= cost) { b -= cost; a += income; updateUI(); }
+        function buyAsset(cost, income) {
+            if (b >= cost) { b -= cost; a += income; updateUI(); saveToCloud(); }
         }
 
         function buySkin(s, cost) {
-            if(b >= cost) {
-                b -= cost;
-                skin = s;
-                document.getElementById('main-coin').className = s;
-                localStorage.setItem('esse_skin', s);
-                updateUI();
-            }
+            if (b >= cost) { b -= cost; skin = s; document.getElementById('main-coin').className = s; updateUI(); saveToCloud(); }
         }
 
-        function connectWallet() {
-            tg.showAlert("TON Connect Yakında!");
+        function updateUI() {
+            document.getElementById('balance').innerText = Math.floor(b).toLocaleString();
+            document.getElementById('passive-val').innerText = a.toFixed(1);
+            document.getElementById('lv-val').innerText = lv;
+            document.getElementById('en-text').innerText = Math.floor(e) + "/500";
+            document.getElementById('en-fill').style.width = (e / 5) + "%";
+            let nxt = 10000 * Math.pow(lv, 2.5);
+            document.getElementById('level-fill').style.width = Math.min((b / nxt) * 100, 100) + "%";
+            if (b >= nxt) { lv++; tg.HapticFeedback.notificationOccurred('success'); }
         }
 
-        // KASİNO SİSTEMİ
-        function playSlot() {
-            if(b < 5000) return;
-            b -= 5000;
-            const items = ['💎', '💰', '🍒', '🌟'];
-            let r1 = items[Math.floor(Math.random()*4)];
-            let r2 = items[Math.floor(Math.random()*4)];
-            let r3 = items[Math.floor(Math.random()*4)];
-            document.getElementById('s1').innerText = r1;
-            document.getElementById('s2').innerText = r2;
-            document.getElementById('s3').innerText = r3;
-            if(r1 === r2 && r2 === r3) { b += 100000; tg.showAlert("JACKPOT! +100k"); }
-            updateUI();
+        function createPop(x, y, txt) {
+            const p = document.createElement('div');
+            p.innerText = txt;
+            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:bold; pointer-events:none; animation: pop 0.6s forwards; z-index:1000;`;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 600);
         }
 
-        function initWheel() {
-            const canvas = document.getElementById('wheel');
-            const ctx = canvas.getContext('2d');
-            for(let i=0; i<8; i++) {
-                ctx.beginPath(); ctx.fillStyle = i%2==0?"#222":varColor('--gold');
-                ctx.moveTo(100,100); ctx.arc(100,100,100, i*(Math.PI/4), (i+1)*(Math.PI/4)); ctx.fill();
-            }
-        }
-        function varColor(name) { return "#ffcf25"; }
-
-        function spinWheel() {
-            if(b < 2000) return;
-            b -= 2000;
-            let deg = 1800 + Math.random()*360;
-            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
-            setTimeout(() => { b += 5000; updateUI(); tg.showAlert("Kazandın: +5.000"); }, 4000);
-        }
-
-        // GÖREV & DAVET
-        function inviteFriend() {
-            const text = "ESSE'de benimle madencilik yap! 25k bonus kazan.";
-            window.open(`https://t.me/share/url?url=https://t.me/EsseStudioBot&text=${encodeURIComponent(text)}`);
-        }
-
-        function renderQuests() {
-            const container = document.getElementById('quest-container');
-            const qList = [
-                { id: 1, t: "10.000 Tıkla", r: 50000, target: 10000 },
-                { id: 2, t: "Level 5 Ol", r: 100000, target: 5 }
-            ];
-            container.innerHTML = "";
-            qList.forEach(q => {
-                const done = quests.includes(q.id);
-                container.innerHTML += `
-                    <div class="card">
-                        <div style="flex:1"><b>${q.t}</b><br><small>+${q.r.toLocaleString()} ESSE</small></div>
-                        <button class="btn-act" onclick="claimQuest(${q.id}, ${q.r})" ${done?'disabled':''}>${done?'OK':'AL'}</button>
-                    </div>
-                `;
-            });
-        }
-
-        function claimQuest(id, r) {
-            if(!quests.includes(id)) {
-                quests.push(id);
-                b += r;
-                localStorage.setItem('esse_quests', JSON.stringify(quests));
-                renderQuests();
-                updateUI();
-            }
-        }
-
-        // BOSS & TURBO
-        function activateTurbo() {
-            turbo = true; turboCharge = 0;
-            document.getElementById('turbo-btn').style.display = "none";
-            setTimeout(() => turbo = false, 15000);
-        }
-
-        function hitBoss() {
-            let hp = document.getElementById('boss-hp');
-            let current = parseFloat(hp.style.width);
-            hp.style.width = (current - 5) + "%";
-            if(current <= 5) { b += 50000; document.getElementById('boss-ui').style.display="none"; updateUI(); }
-        }
-
-        function checkDaily() {
-            let now = new Date().setHours(0,0,0,0);
-            if(lastDaily < now) {
-                document.getElementById('daily-modal').style.display = "flex";
-                lastDaily = now;
-                localStorage.setItem('esse_daily', lastDaily);
-            }
-        }
-        function claimDaily() { b += 5000; document.getElementById('daily-modal').style.display="none"; updateUI(); }
-
-        // SAYFA DEĞİŞİMİ
         function sh(el, id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -353,30 +173,17 @@
             el.classList.add('active');
         }
 
-        // ANA DÖNGÜ
+        // DÖNGÜLER
         setInterval(() => {
-            b += a/10;
-            if(e < 500) e += 0.5;
-            combo = Math.max(1.0, combo - 0.005);
+            b += a / 10;
+            if (e < 500) e += 0.5;
             updateUI();
         }, 100);
 
-        // Rastgele Boss Çıkışı
-        setInterval(() => {
-            if(Math.random() > 0.99 && b > 1000) {
-                document.getElementById('boss-ui').style.display = "flex";
-                document.getElementById('boss-hp').style.width = "100%";
-                let t = 30;
-                let iv = setInterval(() => {
-                    t--; document.getElementById('boss-timer').innerText = t + "s";
-                    if(t <= 0) { clearInterval(iv); document.getElementById('boss-ui').style.display="none"; }
-                }, 1000);
-            }
-        }, 60000);
-    </script>
+        // Her 30 saniyede bir buluta otomatik yedekle
+        setInterval(saveToCloud, 30000);
 
-    <style>
-        @keyframes pop { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-100px); } }
-    </style>
+        initGame();
+    </script>
 </body>
 </html>
