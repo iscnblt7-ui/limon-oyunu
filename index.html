@@ -3,107 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ESSE STUDIO: Galactic Login</title>
+    <title>ESSE STUDIO: Ultimate Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; --glass: rgba(255, 255, 255, 0.05); }
+        :root { --gold: #ffcf25; --bg: #050505; --fire: #ff4500; --green: #00ff88; --blue: #00d9ff; --boss: #cc00ff; --glass: rgba(255, 255, 255, 0.08); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; user-select: none; touch-action: manipulation; }
         body { background: #000; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
         /* GİRİŞ EKRANI */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            background: radial-gradient(circle at center, #151515 0%, #000 100%);
             z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
         }
         .login-box {
-            background: rgba(255,255,255,0.05); padding: 30px; border-radius: 25px; border: 2px solid var(--gold);
-            text-align: center; width: 100%; max-width: 350px; box-shadow: 0 0 30px rgba(255,207,37,0.2);
+            background: var(--glass); padding: 40px 25px; border-radius: 30px; border: 2px solid var(--gold);
+            text-align: center; width: 100%; max-width: 380px; box-shadow: 0 0 40px rgba(255,207,37,0.15);
         }
         .login-input {
-            width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000;
-            color: var(--gold); font-family: 'Orbitron'; text-align: center; margin: 20px 0; font-size: 16px;
+            width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #444; background: #080808;
+            color: var(--gold); font-family: 'Orbitron'; text-align: center; margin: 25px 0; font-size: 18px; outline: none;
         }
 
-        /* HEADER */
-        .header { text-align: center; padding: 15px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); display: none; }
-        #balance { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: var(--gold); }
-        
-        .progress-bar { height: 6px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 8px auto; width: 80%; }
+        /* ÜST PANEL */
+        .header { text-align: center; padding: 20px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--gold); display: none; z-index: 100; }
+        #balance { font-family: 'Orbitron', sans-serif; font-size: 38px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(255,207,37,0.3); }
+        .progress-bar { height: 8px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; margin: 10px auto; width: 85%; }
         #level-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--fire)); width: 0%; transition: 0.4s; }
 
-        /* MAIN CONTENT */
-        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 120px; }
-        .active-screen { display: flex; }
-
-        /* COIN */
-        #main-coin { width: 220px; cursor: pointer; transition: transform 0.05s; margin: 20px 0; }
-        #main-coin:active { transform: scale(0.9); }
-        .skin-neon { filter: drop-shadow(0 0 20px var(--blue)) hue-rotate(180deg); }
-        .skin-fire { filter: drop-shadow(0 0 20px var(--fire)) saturate(2); }
-
-        /* UI ELEMENTS */
-        .card { background: var(--glass); padding: 15px; border-radius: 18px; width: 100%; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-act { background: var(--gold); color: black; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; }
+        /* ANA EKRAN VE GÖRSELLER */
+        .screen { flex-grow: 1; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 130px; }
+        .active-screen { display: flex; animation: fadeIn 0.3s ease; }
         
-        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.98); display: none; padding: 12px 0; border-top: 1px solid #222; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; color: #444; font-size: 9px; font-weight: bold; }
-        .nav-item.active { color: var(--gold); }
-        .nav-item span { display: block; font-size: 22px; margin-bottom: 3px; }
+        #main-coin { width: 240px; cursor: pointer; transition: transform 0.05s; margin: 30px 0; filter: drop-shadow(0 0 15px rgba(255,207,37,0.2)); }
+        #main-coin:active { transform: scale(0.92); }
+        .skin-neon { filter: drop-shadow(0 0 25px var(--blue)) hue-rotate(180deg) !important; }
+        .skin-fire { filter: drop-shadow(0 0 25px var(--fire)) saturate(2) !important; }
 
-        /* SLOT & BOSS */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; }
-        .slot-box { width: 60px; height: 80px; background: #000; border: 2px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 5px; }
+        /* KARTLAR VE BUTONLAR */
+        .card { background: var(--glass); padding: 18px; border-radius: 20px; width: 100%; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-act { background: var(--gold); color: black; border: none; padding: 12px 18px; border-radius: 12px; font-weight: 900; cursor: pointer; font-family: 'Orbitron'; font-size: 11px; transition: 0.2s; }
+        .btn-act:active { transform: scale(0.95); opacity: 0.8; }
 
-        @keyframes pop { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-100px); } }
+        /* ALT MENÜ */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(5,5,5,0.98); display: none; padding: 15px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; color: #555; font-size: 10px; font-weight: bold; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); transform: translateY(-3px); }
+        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
+
+        /* MODALLAR (BOSS & SLOT) */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .slot-box { width: 70px; height: 90px; background: #000; border: 2px solid var(--gold); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 35px; margin: 8px; box-shadow: inset 0 0 15px rgba(255,207,37,0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pop { 0% { opacity:1; transform:translateY(0) scale(1); } 100% { opacity:0; transform:translateY(-120px) scale(1.5); } }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="login-box">
-            <h1 style="font-family:'Orbitron'; color:var(--gold); font-size:24px;">ESSE STUDIO</h1>
-            <p style="font-size:10px; color:#888; margin-top:5px;">Galaktik Madenciliğe Giriş Yap</p>
-            <input type="text" id="username-input" class="login-input" placeholder="Kullanıcı Adı..." maxlength="15">
-            <button class="btn-act" style="width:100%; font-size:14px;" onclick="login()">BAŞLAT</button>
-            <p id="login-status" style="font-size:10px; margin-top:15px; color:var(--blue);"></p>
+            <h1 style="font-family:'Orbitron'; color:var(--gold); font-size:28px; letter-spacing:2px;">ESSE STUDIO</h1>
+            <div style="width:50px; height:2px; background:var(--gold); margin:10px auto;"></div>
+            <p style="font-size:11px; color:#aaa; margin-top:10px;">MADENCİ KİMLİĞİNİZİ DOĞRULAYIN</p>
+            <input type="text" id="username-input" class="login-input" placeholder="Kullanıcı Adı..." maxlength="12">
+            <button class="btn-act" style="width:100%; font-size:16px; padding:20px;" onclick="login()">SİSTEME BAĞLAN</button>
+            <p id="login-status" style="font-size:11px; margin-top:20px; color:var(--blue); font-family:'Orbitron';"></p>
         </div>
     </div>
 
     <div id="boss-ui" class="modal" style="flex-direction: column;">
-        <h1 style="color:var(--fire); font-family:'Orbitron';">BOSS UYARISI!</h1>
-        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="180" onclick="hitBoss()" style="filter:drop-shadow(0 0 30px red); margin:30px;">
-        <div class="progress-bar" style="width:70%; border-color:red;"><div id="boss-hp" style="width:100%; background:red; height:100%;"></div></div>
-        <p id="boss-timer" style="font-family:'Orbitron'; margin-top:10px;">30s</p>
+        <h1 style="color:var(--fire); font-family:'Orbitron'; text-shadow: 0 0 20px red;">BOSS RAID!</h1>
+        <img src="https://cdn-icons-png.flaticon.com/512/3037/3037134.png" width="200" onclick="hitBoss()" style="filter:drop-shadow(0 0 40px red); margin:40px; cursor:pointer;">
+        <div class="progress-bar" style="width:70%; border-color:red; height:12px;"><div id="boss-hp" style="width:100%; background:red; height:100%;"></div></div>
+        <p id="boss-timer" style="font-family:'Orbitron'; margin-top:15px; font-size:20px;">30s</p>
     </div>
 
     <div class="header" id="main-header">
-        <div style="font-size:10px; color:var(--blue); margin-bottom:5px;">PİLOT: <span id="display-name">---</span></div>
+        <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:8px;">
+            <div style="width:8px; height:8px; background:var(--green); border-radius:50%; box-shadow: 0 0 10px var(--green);"></div>
+            <span id="display-name" style="font-family:'Orbitron'; font-size:12px; color:var(--blue); letter-spacing:1px;">---</span>
+        </div>
         <div id="balance">0</div>
         <div class="progress-bar"><div id="level-fill"></div></div>
-        <div style="display:flex; justify-content:space-between; width:80%; margin:auto; font-size:9px; color:#555;">
-            <span>LEVEL <span id="lv-val">1</span></span>
-            <span>PASİF: <span id="passive-val">0</span>/s</span>
+        <div style="display:flex; justify-content:space-between; width:85%; margin:auto; font-size:10px; color:#666; font-weight:bold;">
+            <span>LEVEL <span id="lv-val" style="color:white">1</span></span>
+            <span>PASİF: <span id="passive-val" style="color:var(--green)">0</span>/s</span>
         </div>
     </div>
 
     <div id="game-s" class="screen">
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <div id="combo-text" style="font-family:'Orbitron'; color:var(--blue); font-size:20px; opacity:0;">X1.0</div>
+            <div id="combo-text" style="font-family:'Orbitron'; color:var(--blue); font-size:26px; opacity:0; font-weight:900;">X1.0</div>
             <img src="https://cdn-icons-png.flaticon.com/512/2529/2529396.png" id="main-coin" ontouchstart="handleTouch(event)">
-            <div style="width:180px;">
-                <div style="display:flex; justify-content:space-between; font-size:9px; margin-bottom:4px;"><span>ENERJİ</span><span id="en-text">500/500</span></div>
-                <div class="progress-bar" style="width:100%; margin:0;"><div id="en-fill" style="width:100%; background:var(--gold); height:100%;"></div></div>
+            <div style="width:200px; background:rgba(255,255,255,0.03); padding:15px; border-radius:20px; border:1px solid #222;">
+                <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:6px; font-weight:bold;"><span>ENERJİ</span><span id="en-text">500/500</span></div>
+                <div class="progress-bar" style="width:100%; margin:0; height:6px;"><div id="en-fill" style="width:100%; background:var(--gold); height:100%;"></div></div>
             </div>
         </div>
     </div>
 
     <div id="market-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--blue); margin-bottom:20px;">BORSA & EKİPMAN</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--blue); margin-bottom:25px; letter-spacing:2px;">MARKET & CÜZDAN</h3>
+        <div class="card" style="background:rgba(0,217,255,0.05); border-color:var(--blue);">
+            <div style="flex:1"><b>TON Wallet</b><br><small style="color:#888;">Cüzdanını Bağla</small></div>
+            <button class="btn-act" style="background:var(--blue); color:white;" onclick="alert('Yakında Aktif Olacak!')">BAĞLA</button>
+        </div>
         <div class="card">
-            <div style="flex:1"><b>Auto Miner V1</b><br><small>+5/s Pasif Gelir</small></div>
-            <button class="btn-act" onclick="buyAsset(5000, 5)">5,000 AL</button>
+            <div style="flex:1"><b>Auto Bot V2</b><br><small>+10/s Pasif Gelir</small></div>
+            <button class="btn-act" onclick="buyAsset(10000, 10)">10,000 AL</button>
+        </div>
+        <div class="card">
+            <div style="flex:1"><b>Ateş Görünümü</b><br><small>Coin Efektini Değiştir</small></div>
+            <button class="btn-act" onclick="buySkin('skin-fire', 25000)">25,000 AL</button>
         </div>
         <div class="card">
             <div style="flex:1"><b>Neon Görünüm</b><br><small>Mavi Işıltı</small></div>
@@ -112,30 +125,31 @@
     </div>
 
     <div id="task-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--boss); margin-bottom:20px;">GÖREVLER</h3>
+        <h3 style="font-family:'Orbitron'; color:var(--boss); margin-bottom:25px;">GÖREV MERKEZİ</h3>
         <div class="card">
-            <div style="flex:1"><b>Arkadaş Daveti</b><br><small>Kişi başı 50k ESSE</small></div>
-            <button class="btn-act" onclick="inviteFriend()">DAVET</button>
+            <div style="flex:1"><b>Referans Sistemi</b><br><small>Davet Başı 50.000 ESSE</small></div>
+            <button class="btn-act" onclick="inviteFriend()">DAVET ET</button>
         </div>
         <div id="quest-list" style="width:100%;"></div>
     </div>
 
     <div id="casino-s" class="screen">
-        <h3 style="font-family:'Orbitron'; color:var(--fire); margin-bottom:20px;">ŞANS MERKEZİ</h3>
-        <div style="display:flex; margin-bottom:20px;">
-            <div class="slot-box" id="s1">❓</div><div class="slot-box" id="s2">❓</div><div class="slot-box" id="s3">❓</div>
+        <h3 style="font-family:'Orbitron'; color:var(--fire); margin-bottom:25px;">KASİNO</h3>
+        <div style="display:flex; margin-bottom:25px;">
+            <div class="slot-box" id="s1">💎</div><div class="slot-box" id="s2">💎</div><div class="slot-box" id="s3">💎</div>
         </div>
-        <button class="btn-act" onclick="playSlot()" style="width:200px;">SLOT ÇEVİR (5k)</button>
-        <div style="margin-top:40px; text-align:center;">
-            <canvas id="wheel" width="180" height="180" style="border-radius:50%; border:5px solid #222;"></canvas><br>
-            <button class="btn-act" onclick="spinWheel()" style="margin-top:15px;">ÇARK (2k)</button>
+        <button class="btn-act" onclick="playSlot()" style="width:220px; padding:18px;">SLOTU ÇEVİR (5.000)</button>
+        
+        <div style="margin-top:50px; text-align:center;">
+            <canvas id="wheel" width="200" height="200" style="border-radius:50%; border:6px solid #222; box-shadow: 0 0 30px rgba(0,0,0,0.5);"></canvas><br>
+            <button class="btn-act" onclick="spinWheel()" style="margin-top:20px; width:150px;">ÇARK (2.000)</button>
         </div>
     </div>
 
     <nav class="nav" id="main-nav">
-        <div class="nav-item active" onclick="sh(this,'game-s')"><span>⛏️</span>MADEN</div>
-        <div class="nav-item" onclick="sh(this,'market-s')"><span>🚀</span>MARKET</div>
-        <div class="nav-item" onclick="sh(this,'task-s')"><span>📋</span>GÖREV</div>
+        <div class="nav-item active" onclick="sh(this,'game-s')"><span>💎</span>MADEN</div>
+        <div class="nav-item" onclick="sh(this,'market-s')"><span>🚀</span>BORSA</div>
+        <div class="nav-item" onclick="sh(this,'task-s')"><span>📜</span>GÖREV</div>
         <div class="nav-item" onclick="sh(this,'casino-s')"><span>🎰</span>ŞANS</div>
     </nav>
 
@@ -143,18 +157,18 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // FIREBASE - BURAYA KENDİ LİNKİNİ YAZ
-        const DATABASE_URL = "https://esseoyunu-default-rtdb.firebaseio.com/"; 
+        // !!! BURAYA KENDİ FIREBASE LİNKİNİ YAZ !!!
+        const DATABASE_URL = "https://console.firebase.google.com/u/2/project/esseoyunu/database/esseoyunu-default-rtdb/data/~2F"; 
 
         let currentUser = "";
-        let b = 0, a = 0, lv = 1, e = 500, clicks = 0, skin = "", quests = [], combo = 1.0;
+        let b = 0, a = 0, lv = 1, e = 500, skin = "", quests = [], combo = 1.0;
 
-        // GİRİŞ FONKSİYONU
+        // GİRİŞ MANTIĞI
         async function login() {
             const input = document.getElementById('username-input').value.trim().toLowerCase();
-            if(input.length < 3) return alert("Kullanıcı adı en az 3 harf olmalı!");
+            if(input.length < 3) return alert("Kullanıcı adı çok kısa!");
             
-            document.getElementById('login-status').innerText = "Veriler senkronize ediliyor...";
+            document.getElementById('login-status').innerText = "SİNYAL ALINIYOR...";
             currentUser = input;
 
             try {
@@ -162,20 +176,18 @@
                 const d = await res.json();
                 
                 if(d) {
-                    // Kayıtlı Kullanıcı
                     b = d.b || 0; a = d.a || 0; lv = d.lv || 1;
                     e = d.e || 500; skin = d.skin || ""; quests = d.quests || [];
                 } else {
-                    // Yeni Kayıt
+                    // Yeni kullanıcı oluştur
                     await fetch(`${DATABASE_URL}users/${currentUser}.json`, {
                         method: 'PUT',
                         body: JSON.stringify({ b:0, a:0, lv:1, e:500, skin:"", quests:[] })
                     });
                 }
-
                 startApp();
             } catch(err) {
-                alert("Bağlantı hatası! Lütfen internetinizi kontrol edin.");
+                alert("Bağlantı Başarısız!");
             }
         }
 
@@ -191,26 +203,26 @@
             renderQuests();
             updateUI();
             
-            // Döngüleri Başlat
             setInterval(gameLoop, 100);
-            setInterval(saveCloud, 15000); // 15 saniyede bir otomatik kayıt
+            setInterval(saveCloud, 20000); // 20 saniyede bir buluta yedek
         }
 
         async function saveCloud() {
             if(!currentUser) return;
-            const data = { b, a, lv, e, clicks, skin, quests, lastSeen: Date.now() };
+            const data = { b, a, lv, e, skin, quests, lastUpdate: Date.now() };
             fetch(`${DATABASE_URL}users/${currentUser}.json`, { method: 'PUT', body: JSON.stringify(data) });
         }
 
+        // TIKLAMA MANTIĞI
         function handleTouch(ev) {
             ev.preventDefault();
             if(e >= 2) {
-                clicks++; e -= 2;
+                e -= 2;
                 let gain = lv * combo;
                 b += gain;
-                combo = Math.min(combo + 0.02, 4.0);
+                combo = Math.min(combo + 0.02, 5.0);
                 createPop(ev.touches[0].pageX, ev.touches[0].pageY, "+" + Math.floor(gain));
-                tg.HapticFeedback.impactOccurred('light');
+                tg.HapticFeedback.impactOccurred('medium');
                 updateUI();
             }
         }
@@ -222,66 +234,69 @@
             document.getElementById('en-text').innerText = Math.floor(e) + "/500";
             document.getElementById('en-fill').style.width = (e/5) + "%";
             
-            let nxt = 15000 * Math.pow(lv, 2.2);
-            document.getElementById('level-fill').style.width = Math.min((b/nxt)*100, 100) + "%";
-            if(b >= nxt) { lv++; tg.HapticFeedback.notificationOccurred('success'); saveCloud(); }
+            let nextLv = 20000 * Math.pow(lv, 2.3);
+            document.getElementById('level-fill').style.width = Math.min((b/nextLv)*100, 100) + "%";
+            if(b >= nextLv) { lv++; tg.HapticFeedback.notificationOccurred('success'); saveCloud(); }
             
             let ct = document.getElementById('combo-text');
             ct.innerText = "X" + combo.toFixed(1);
-            ct.style.opacity = combo > 1.1 ? 1 : 0;
+            ct.style.opacity = combo > 1.2 ? 1 : 0;
         }
 
+        // MARKET & GÖRÜNÜM
         function buyAsset(cost, inc) { if(b >= cost) { b -= cost; a += inc; updateUI(); saveCloud(); } }
         function buySkin(s, cost) { if(b >= cost) { b -= cost; skin = s; document.getElementById('main-coin').className = s; updateUI(); saveCloud(); } }
 
+        // KASİNO SİSTEMİ
         function playSlot() {
             if(b < 5000) return; b -= 5000;
-            const s = ['💎', '💰', '🍒', '🚀'];
+            const s = ['💎', '🚀', '💰', '🔥'];
             let r = [s[Math.floor(Math.random()*4)], s[Math.floor(Math.random()*4)], s[Math.floor(Math.random()*4)]];
             document.getElementById('s1').innerText = r[0]; document.getElementById('s2').innerText = r[1]; document.getElementById('s3').innerText = r[2];
-            if(r[0]==r[1] && r[1]==r[2]) { b += 100000; alert("JACKPOT! +100k"); }
+            if(r[0]==r[1] && r[1]==r[2]) { b += 150000; alert("MUHTEŞEM! +150k"); }
             updateUI();
         }
 
         function initWheel() {
             const ctx = document.getElementById('wheel').getContext('2d');
             for(let i=0; i<8; i++) {
-                ctx.beginPath(); ctx.fillStyle = i%2==0?"#111":varColor('--gold');
-                ctx.moveTo(90,90); ctx.arc(90,90,90, i*(Math.PI/4), (i+1)*(Math.PI/4)); ctx.fill();
+                ctx.beginPath(); ctx.fillStyle = i%2==0?"#111":"#ffcf25";
+                ctx.moveTo(100,100); ctx.arc(100,100,100, i*(Math.PI/4), (i+1)*(Math.PI/4)); ctx.fill();
             }
         }
-        function varColor(n) { return "#ffcf25"; }
-
         function spinWheel() {
             if(b < 2000) return; b -= 2000;
             document.getElementById('wheel').style.transition = "4s cubic-bezier(0.1,0,0.1,1)";
-            document.getElementById('wheel').style.transform = `rotate(${2000 + Math.random()*360}deg)`;
-            setTimeout(() => { b += 10000; updateUI(); saveCloud(); }, 4000);
+            document.getElementById('wheel').style.transform = `rotate(${2500 + Math.random()*360}deg)`;
+            setTimeout(() => { b += 12000; updateUI(); saveCloud(); }, 4000);
         }
 
+        // BOSS SİSTEMİ
         function hitBoss() {
             let hp = document.getElementById('boss-hp');
-            let w = parseFloat(hp.style.width);
-            hp.style.width = (w - 5) + "%";
-            if(w <= 5) { b += 50000; document.getElementById('boss-ui').style.display="none"; updateUI(); saveCloud(); }
+            let currentWidth = parseFloat(hp.style.width);
+            hp.style.width = (currentWidth - 4) + "%";
+            if(currentWidth <= 4) { b += 75000; document.getElementById('boss-ui').style.display="none"; updateUI(); saveCloud(); }
         }
 
+        // GÖREVLER
         function renderQuests() {
-            const qs = [{id:1, t:"Başlangıç Hediyesi", r:1000}];
+            const qs = [{id:1, t:"Hoşgeldin Bonusu", r:5000}, {id:2, t:"Twitter Takip", r:15000}];
             let h = "";
             qs.forEach(q => {
                 const done = quests.includes(q.id);
-                h += `<div class="card"><div style="flex:1"><b>${q.t}</b><br><small>+${q.r}</small></div>
-                <button class="btn-act" onclick="claimQ(${q.id},${q.r})" ${done?'disabled':''}>${done?'OK':'AL'}</button></div>`;
+                h += `<div class="card"><div style="flex:1"><b>${q.t}</b><br><small>+${q.r} ESSE</small></div>
+                <button class="btn-act" onclick="claimQ(${q.id},${q.r})" ${done?'disabled':''}>${done?'BİTTİ':'AL'}</button></div>`;
             });
             document.getElementById('quest-list').innerHTML = h;
         }
         function claimQ(id, r) { if(!quests.includes(id)) { quests.push(id); b += r; renderQuests(); updateUI(); saveCloud(); } }
-        function inviteFriend() { window.open(`https://t.me/share/url?url=https://t.me/EsseStudioBot&text=ESSE Madenciliğe katıl!`); }
+        function inviteFriend() { window.open(`https://t.me/share/url?url=https://t.me/EsseStudioBot&text=Hadi madene gel!`); }
 
+        // DİĞER
         function createPop(x, y, txt) {
             let p = document.createElement('div'); p.innerText = txt;
-            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-weight:bold; animation: pop 0.8s forwards; z-index:9999;`;
+            p.style.cssText = `position:fixed; left:${x}px; top:${y}px; color:var(--gold); font-family:Orbitron; font-weight:bold; animation: pop 0.8s forwards; z-index:9999; pointer-events:none;`;
             document.body.appendChild(p); setTimeout(() => p.remove(), 800);
         }
 
@@ -293,19 +308,18 @@
 
         function gameLoop() {
             b += a/10;
-            if(e < 500) e += 0.3;
-            combo = Math.max(1.0, combo - 0.005);
+            if(e < 500) e += 0.4;
+            combo = Math.max(1.0, combo - 0.008);
             updateUI();
         }
 
-        // Rastgele Boss
+        // Rastgele Boss Çıkışı
         setInterval(() => {
-            if(currentUser && Math.random() > 0.98) {
+            if(currentUser && Math.random() > 0.97) {
                 document.getElementById('boss-ui').style.display = "flex";
                 document.getElementById('boss-hp').style.width = "100%";
             }
         }, 60000);
-
     </script>
 </body>
 </html>
